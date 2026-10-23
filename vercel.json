@@ -5,7 +5,7 @@
   "regions": ["fra1"],
   "rewrites": [
     { "source": "/api/:rute*", "destination": "/api?rute=:rute*" },
-    { "source": "/k/:token", "destination": "/kunde.html" }
+    { "source": "/k/:token", "destination": "/kunde" }
   ],
   "headers": [
     {
