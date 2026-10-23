@@ -66,7 +66,7 @@ function prosjektkort(p, dag) {
         <div class="linje" style="margin-top:7px"><span>${p.ferdig} av ${p.total} oppgaver godkjent</span><span>${p.aktive} pågår nå</span></div>
       </div>
       ${p.neste_milepael
-        ? html`<div class="linje"><span>${icon('flag')}&nbsp; ${p.neste_milepael.navn}</span><span class="mono">${ddmm(p.neste_milepael.dato)}</span></div>`
+        ? html`<div class="linje"><span>${icon('flag')} ${p.neste_milepael.navn}</span><span>${ddmm(p.neste_milepael.dato)}</span></div>`
         : ''}
       <div class="varsler">
         ${p.forsinket ? html`<span class="chip fare">${p.forsinket} forsinket</span>` : ''}

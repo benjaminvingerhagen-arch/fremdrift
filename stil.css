@@ -773,3 +773,46 @@ body.kundeside { background: #f4f2ed; font-size: 15px; }
 .lenkeboks { min-width: 0; }
 .lenkeboks code { min-width: 0; }
 .kort-topp { flex-wrap: wrap; }
+
+/* Ikon ved siden av tekst: ikonet skal stå midt på tekstlinjen, ikke på grunnlinjen.
+   Et innebygd SVG på 18 px gjør ellers linjen høyere og skyver teksten ned. */
+:where(span, small, a, strong, em, label, summary):has(> svg.ikon) { display: inline-flex; align-items: center; gap: 5px; }
+.banner { align-items: flex-start; }
+.banner .ikon { margin-top: 1px; }
+.banner .knapp { align-self: center; }
+
+/* Gantt-tabellen skal rulle inne i sin egen boks, ikke gjøre hele siden bredere. */
+.skall > div { min-width: 0; }
+.plan-tabell { --venstre: 560px; }
+@media (max-width: 860px) {
+  .plan-tabell { --venstre: 220px; }
+  .plan.kompakt .pv { grid-template-columns: 28px minmax(0, 1fr); gap: 0 8px; padding: 0 8px; }
+  .plan.kompakt .pv .nr, .plan.kompakt .pv > .chip, .plan.kompakt .plan-hode .pv > span:not(:nth-child(1)):not(:nth-child(3)) { display: none; }
+  .plan.kompakt .plan-fag .bar { width: 60px; }
+  .verktoy select { flex: 1; min-width: 0; }
+  .verktoy .segment { flex: none; }
+  .verktoy [data-import], .verktoy .spacer { display: none; }
+  .faner { margin-left: -16px; margin-right: -16px; padding: 0 12px; }
+  .topp .knapp { flex: 1; }
+}
+.sjekk h3 .avkrysning { align-items: center; font-size: 13.5px; font-weight: 550; }
+.sjekk h3 .avkrysning input { margin: 0; }
+
+/* Mobil: gi innholdet plass i stedet for å klemme det ved siden av knappene. */
+@media (max-width: 640px) {
+  .tall-rad > .tall:first-child { grid-column: 1 / -1; }
+  .orad:has(.hoyre .knapp) { grid-template-columns: minmax(0, 1fr); }
+  .orad:has(.hoyre .knapp) .hoyre { justify-content: flex-end; }
+  .orad .hva strong { white-space: normal; }
+  .person { grid-template-columns: auto minmax(0, 1fr); }
+  .person > :last-child { grid-column: 2; justify-self: start; }
+  .oppdatering > div:first-child { flex-wrap: wrap; row-gap: 2px; }
+}
+/* Linjer med tekst i ulik størrelse (f.eks. navn + dato i mono) stilles etter grunnlinjen. */
+.pkort .linje { align-items: center; }
+@media (max-width: 640px) { .nytt-kort { min-height: 130px; padding: 18px; } }
+/* Når etiketten brytes over to linjer på mobil, skal ikonet følge første linje. */
+.tall .etikett { align-items: flex-start; }
+.tall .etikett .ikon { margin-top: 1.5px; }
+
+@media (max-width: 640px) { .tall-rad > .tall:last-child:nth-child(even) { grid-column: 1 / -1; } }

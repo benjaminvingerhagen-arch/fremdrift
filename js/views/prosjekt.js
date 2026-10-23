@@ -329,7 +329,7 @@ function tegnPlan(el, ctx) {
 
   el.innerHTML = html`<div class="plan ${gantt ? 'kompakt' : ''}">
     <div class="plan-rull">
-      <div class="plan-tabell" style="grid-template-columns:${gantt ? `560px ${antall * DAG_BREDDE}px` : 'minmax(760px, 1fr)'};--dag:${DAG_BREDDE}px">
+      <div class="plan-tabell" style="grid-template-columns:${gantt ? `var(--venstre) ${antall * DAG_BREDDE}px` : 'minmax(760px, 1fr)'};--dag:${DAG_BREDDE}px">
         <div class="plan-hode">
           <div class="pv"><span></span><span>Nr</span><span>Oppgave</span><span class="skjul-kompakt">Periode</span><span class="skjul-kompakt">Prioritet</span><span>Status</span></div>
           ${gantt ? html`<div class="ph">
