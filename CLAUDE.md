@@ -16,7 +16,9 @@ npm test                        # i et annet vindu, mot dev-serveren på tom dat
 ```
 
 - Testene må være grønne før en endring foreslås. Start alltid på tom database (`rm -rf .dev-db`).
-- `DATO=2026-11-04 npm run dev` lar serveren late som det er en annen dag.
+- `DATO=2026-11-04 npm run dev` lar serveren late som det er en annen dag. Nettleseren følger
+  ikke med: der må `globalThis.__FREMDRIFT_DATO = '2026-11-04'` settes før appen lastes
+  (f.eks. med Playwrights `addInitScript`), ellers regner siden status ut fra dagens dato.
 - Det er ingen byggesteg: nettleseren laster `js/` og `shared/` direkte som ES-moduler.
 
 ## Slik er koden bygget
@@ -24,7 +26,8 @@ npm test                        # i et annet vindu, mot dev-serveren på tom dat
 - `api/index.js` er én serverless-funksjon for hele API-et. Ruter registreres med
   `route(metode, sti, handler, opts)` i `api/_lib/routes/`.
 - Tilgang per rute: `{ public: true }` = alle, `{ alle: true }` = alle innloggede,
-  ingenting = bare prosjektleder. Nye ruter skal ha minst mulig tilgang.
+  ingenting = bare prosjektleder. Kundesiden bruker egne ruter i
+  `api/_lib/routes/kunde.js` med kundelenken som nøkkel. Nye ruter skal ha minst mulig tilgang.
 - Endringer (ikke GET) krever headeren `X-FD: 1` og samme opprinnelse (CSRF-vern).
 - Felter fra klienten leses med `readFields(body, SPEC)` og konverterne i `f` (`api/_lib/http.js`).
 - Databaseskjemaet ligger i `api/_lib/schema.js`. Ved endring: øk `VERSJON` og legg
@@ -44,7 +47,10 @@ npm test                        # i et annet vindu, mot dev-serveren på tom dat
 - Kunden skal aldri se interne felt: «forsinket», merknader, ansvarlig, nøkler eller logg.
 - En leverandør ser bare egne oppgaver (ansvarlig, eller eget fag når ingen er ansvarlig).
 - En oppgave er ferdig først når prosjektlederen har godkjent den.
-- Hemmelige nøkler (personlige lenker, kundelenker) lagres bare som SHA-256-hash når det går.
+- Hemmelige nøkler lagres som SHA-256-hash når det går: personlige lenker (`lenke_hash`) og
+  økter (`token_hash`). Kundelenken (`kunde_token`) og app-nøkkelen (`app_nokkel`) ligger i
+  klartekst fordi prosjektlederen skal kunne kopiere kundelenken igjen og appen trenger
+  startadressen. Nye nøkler skal hashes med mindre de må vises på nytt.
 - Hver ny rute eller tilgangsregel får tester i `scripts/test.mjs`, inkludert at uvedkommende avvises.
 - Alt brukeren ser er på norsk bokmål. Variabel- og funksjonsnavn følger samme stil (norske navn).
 - Repoet er offentlig: aldri legg inn nøkler, personopplysninger, kundenavn eller interne detaljer.
