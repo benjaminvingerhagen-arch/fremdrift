@@ -175,9 +175,12 @@ CREATE TABLE IF NOT EXISTS oppgave_lest (
   tid TIMESTAMPTZ NOT NULL DEFAULT now(),
   PRIMARY KEY (bruker_id, oppgave_id)
 );
+
+-- Versjon 4: kalenderabonnement. Bare hash av nøkkelen lagres.
+ALTER TABLE brukere ADD COLUMN IF NOT EXISTS kalender_hash TEXT UNIQUE;
 `;
 
-const VERSJON = 3;
+const VERSJON = 4;
 let klar = null;
 
 export function ensureSchema() {

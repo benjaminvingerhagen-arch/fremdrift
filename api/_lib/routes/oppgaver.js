@@ -22,7 +22,7 @@ const SPEC = {
 // En oppgave er «din» når du står som ansvarlig, eller når ingen står som ansvarlig
 // og den er i ditt fag. Da kan en leverandør legges inn én gang og få alle
 // oppgavene for faget sitt i alle prosjekter.
-const MINE = `(o.ansvarlig_id = $1 OR (o.ansvarlig_id IS NULL AND $2::text IS NOT NULL AND lower(o.fag) = lower($2::text)))`;
+export const MINE = `(o.ansvarlig_id = $1 OR (o.ansvarlig_id IS NULL AND $2::text IS NOT NULL AND lower(o.fag) = lower($2::text)))`;
 
 async function hentOppgave(id) {
   const o = await one('SELECT * FROM oppgaver WHERE id = $1', [id]);

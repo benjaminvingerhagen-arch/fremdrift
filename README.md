@@ -41,6 +41,11 @@ interne merknader eller hvem som er ansvarlig.
 - **Forskyv planen**: flytt alle åpne oppgaver fra en dato – for ett fag eller alle – et antall
   arbeidsdager frem eller tilbake. Helger hoppes over, godkjente oppgaver blir liggende.
 - **Del bilde med kunden**: bilder leverandøren sender på en oppgave kan legges rett ut på kundesiden.
+- **Kalenderabonnement**: ansatte og leverandører trykker «Legg i kalenderen» på siden med
+  oppgavene sine og får en personlig kalenderadresse (.ics) for iPhone, Google Kalender eller
+  Outlook. Egne oppgaver og viktige datoer (fast dato, innflytting, sluttfrist) kommer inn som
+  heldagshendelser og oppdateres av seg selv. Adressen lagres bare som hash, og slutter å virke
+  når personen får ny lenke, blir deaktivert eller slår kalenderen av.
 - **App på hjemskjermen**: «Del → Legg til på Hjem-skjerm» (iPhone) eller «Installer app» (Android).
   Leverandører får en egen startadresse, så appen åpner rett på oppgavelisten deres.
   Den byttes ut når du lager ny lenke til personen.

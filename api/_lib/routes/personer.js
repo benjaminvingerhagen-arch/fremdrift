@@ -49,11 +49,12 @@ route('PUT', '/personer/:id', async ({ params, body, user }) => {
   return { ok: true };
 });
 
-// Ny lenke: den gamle slutter å virke, og alle åpne økter for personen avsluttes.
+// Ny lenke: den gamle slutter å virke, alle åpne økter for personen avsluttes, og
+// kalenderabonnementet stopper (personen lager et nytt fra sin egen side).
 route('POST', '/personer/:id/lenke', async ({ params }) => {
   const id = f.id(params.id);
   const nokkel = nyNokkel();
-  const rad = await one(`UPDATE brukere SET lenke_hash = $1, app_nokkel = NULL WHERE id = $2 AND rolle <> 'leder' RETURNING id`, [sha256(nokkel), id]);
+  const rad = await one(`UPDATE brukere SET lenke_hash = $1, app_nokkel = NULL, kalender_hash = NULL WHERE id = $2 AND rolle <> 'leder' RETURNING id`, [sha256(nokkel), id]);
   if (!rad) fail(404, 'Fant ikke personen, eller personen logger inn med passord.');
   await endSessionsFor(id);
   return { nokkel };
