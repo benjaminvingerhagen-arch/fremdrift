@@ -206,6 +206,33 @@ sjekk('kunden ser synlige mangler med status', kundeM.length === 1 && kundeM[0].
 sjekk('kunden ser ikke frist eller ansvarlig på mangler', !JSON.stringify(kundeM).includes('frist') && !JSON.stringify(kundeM).includes('ansvarlig'));
 sjekk('mangel kan slettes', (await leder('DELETE', `/mangler/${m2.id}`)).status === 200 && (await leder('GET', `/prosjekter/${p.id}`)).data.mangler.length === 1);
 
+console.log('Dagbok:');
+const dbBilde = (await leder('POST', '/vedlegg', png, { 'Content-Type': 'image/png', 'X-Prosjekt': String(p.id) })).data;
+const fremmedBilde = (await leder('POST', '/vedlegg', png, { 'Content-Type': 'image/png', 'X-Prosjekt': String(annet.id) })).data;
+sjekk('tom dagbokside avvises', (await leder('PUT', `/prosjekter/${p.id}/dagbok/2026-11-03`, {})).status === 400);
+const db1 = await leder('PUT', `/prosjekter/${p.id}/dagbok/2026-11-03`, {
+  vaer: 'regn', temperatur: 4, notat: 'Elektro trakk kabler i 2. etg.', avvik: 'Leveranse av sparkel forsinket',
+  bemanning: [{ fag: 'Elektro', antall: 2 }, { fag: 'Maler', antall: 0 }, { fag: '', antall: 3 }], bilder: [dbBilde.id],
+});
+sjekk('prosjektleder skriver i dagboken', db1.status === 200 && db1.data.vaer === 'regn' && db1.data.temperatur === 4, JSON.stringify(db1.data));
+sjekk('bemanning uten fag eller antall tas ikke med', db1.data.bemanning.length === 1 && db1.data.bemanning[0].antall === 2);
+sjekk('ugyldig vær avvises', (await leder('PUT', `/prosjekter/${p.id}/dagbok/2026-11-03`, { vaer: 'tornado', notat: 'x' })).status === 400);
+sjekk('urimelig temperatur avvises', (await leder('PUT', `/prosjekter/${p.id}/dagbok/2026-11-03`, { temperatur: 90, notat: 'x' })).status === 400);
+sjekk('bilde fra annet prosjekt avvises', (await leder('PUT', `/prosjekter/${p.id}/dagbok/2026-11-03`, { notat: 'x', bilder: [fremmedBilde.id] })).status === 400);
+const db2 = await leder('PUT', `/prosjekter/${p.id}/dagbok/2026-11-03`, { ...db1.data, notat: 'Elektro trakk kabler i 2. etg. og monterte bokser.' });
+sjekk('samme dag oppdateres i stedet for å dobles', db2.status === 200 && (await leder('GET', `/prosjekter/${p.id}/dagbok`)).data.length === 1);
+sjekk('leverandør ser ikke dagboken', (await lev2('GET', `/prosjekter/${p.id}/dagbok`)).status === 403);
+sjekk('leverandør kan ikke skrive i dagboken', (await lev2('PUT', `/prosjekter/${p.id}/dagbok/2026-11-04`, { notat: 'x' })).status === 403);
+const kundeFor = (await kunde('GET', `/k/${nyLenke.kunde_token}`)).data;
+sjekk('dagboken er ikke på kundesiden', !JSON.stringify(kundeFor).includes('sparkel') && !JSON.stringify(kundeFor).includes('monterte bokser'));
+const delt = await leder('POST', `/prosjekter/${p.id}/dagbok/2026-11-03/del`, { tittel: 'Tirsdag i 2. etasje' });
+sjekk('dagen deles som oppdatering', delt.status === 200 && delt.data.tekst.includes('monterte bokser') && delt.data.bilder.includes(dbBilde.id), JSON.stringify(delt.data));
+const kundeEtter = (await kunde('GET', `/k/${nyLenke.kunde_token}`)).data;
+sjekk('kunden ser den delte dagen uten avvik', JSON.stringify(kundeEtter.oppdateringer).includes('Tirsdag i 2. etasje') && !JSON.stringify(kundeEtter).includes('sparkel'));
+sjekk('kunden får bildet fra den delte dagen', (await fetch(`${BASE}/api/k/${nyLenke.kunde_token}/fil/${dbBilde.id}`)).status === 200);
+sjekk('samme dag kan ikke deles to ganger', (await leder('POST', `/prosjekter/${p.id}/dagbok/2026-11-03/del`, {})).status === 400);
+sjekk('dagboksiden kan slettes', (await leder('DELETE', `/prosjekter/${p.id}/dagbok/2026-11-03`)).status === 200 && (await leder('GET', `/prosjekter/${p.id}/dagbok`)).data.length === 0);
+
 console.log('App på hjemskjermen:');
 const man = await fetch(`${BASE}/api/manifest`).then((r) => r.json());
 sjekk('manifest uten innlogging starter på forsiden', man.start_url === '/');

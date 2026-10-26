@@ -1,6 +1,7 @@
 import { api } from '../api.js';
 import { html, raw, icon, $, $$, bar, progressRing, modal, attempt, formData, bekreft, kopier, toast, avatar, kobleDatoer } from '../ui.js';
 import { manglerFane } from './mangler.js';
+import { dagbokFane } from './dagbok.js';
 import { fagHue, store } from '../store.js';
 import { oppfrisk } from '../app.js';
 import { lesFremdriftsplan } from '../regneark.js';
@@ -15,6 +16,7 @@ const FANER = [
   ['plan', 'Fremdriftsplan', 'gantt'],
   ['sjekkpunkter', 'Sjekkpunkter', 'checkCircle'],
   ['mangler', 'Mangler', 'alert'],
+  ['dagbok', 'Dagbok', 'file'],
   ['kunde', 'Kundeside', 'eye'],
   ['logg', 'Logg', 'clock'],
   ['innstillinger', 'Innstillinger', 'settings'],
@@ -73,6 +75,7 @@ export async function prosjektView(el, id, fane = '', erAktuell = () => true) {
   if (fane === 'plan') return plan(f, ctx);
   if (fane === 'sjekkpunkter') return sjekkFane(f, ctx);
   if (fane === 'mangler') return manglerFane(f, ctx);
+  if (fane === 'dagbok') return dagbokFane(f, ctx);
   if (fane === 'kunde') return kundeFane(f, ctx);
   if (fane === 'logg') return loggFane(f, ctx);
   if (fane === 'innstillinger') return innstillinger(f, ctx);
