@@ -203,9 +203,26 @@ CREATE TABLE IF NOT EXISTS mangler (
   endret TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS mangler_prosjekt_idx ON mangler (prosjekt_id);
+
+-- Versjon 6: dagbok. Én side per prosjekt og dag. Intern for prosjektlederen; kan deles
+-- med kunden som en vanlig oppdatering (oppdatering_id), uten avvik.
+CREATE TABLE IF NOT EXISTS dagbok (
+  prosjekt_id INT NOT NULL REFERENCES prosjekter(id) ON DELETE CASCADE,
+  dato DATE NOT NULL,
+  bemanning JSONB NOT NULL DEFAULT '[]',
+  vaer TEXT,
+  temperatur INT,
+  notat TEXT,
+  avvik TEXT,
+  bilder JSONB NOT NULL DEFAULT '[]',
+  oppdatering_id INT REFERENCES oppdateringer(id) ON DELETE SET NULL,
+  skrevet_av TEXT,
+  endret TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (prosjekt_id, dato)
+);
 `;
 
-const VERSJON = 5;
+const VERSJON = 6;
 let klar = null;
 
 export function ensureSchema() {

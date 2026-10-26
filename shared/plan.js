@@ -143,3 +143,6 @@ export function mangelStatus(m, dato = iDag()) {
   if (m.frist && m.frist < dato) return 'forsinket';
   return 'apen';
 }
+
+// ---------- Dagbok ----------
+export const VAER = { sol: 'Sol', skyet: 'Skyet', regn: 'Regn', sno: 'Snø', vind: 'Sterk vind', frost: 'Frost' };

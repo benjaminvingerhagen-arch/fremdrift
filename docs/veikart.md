@@ -9,25 +9,25 @@ Bygglet m.fl.), tilpasset små byggefirma og håndverkere.
 
 ## Neste
 
-1. **Dagbok på prosjektet** – kort notat per dag med bemanning, vær, avvik og bilder.
-   Gir dokumentasjon ved uenighet om fremdrift. Kan velges om skal vises for kunden.
-2. **Utkast til ukesoppdatering for kunden** – fredag lages et forslag til oppdatering ut
+1. **Utkast til ukesoppdatering for kunden** – fredag lages et forslag til oppdatering ut
    fra ukens godkjente oppgaver og bilder, som prosjektlederen retter og publiserer.
-3. **Avhengigheter mellom oppgaver** – «starter når X er ferdig», og tilbud om å flytte
+2. **Avhengigheter mellom oppgaver** – «starter når X er ferdig», og tilbud om å flytte
    bare de etterfølgende oppgavene når én oppgave flyttes (i dag kan planen forskyves for
    ett fag eller alle fag fra en valgt dato).
-4. **Tilleggsarbeid som kunden godkjenner** – beskrivelse og pris, kunden godkjenner på
+3. **Tilleggsarbeid som kunden godkjenner** – beskrivelse og pris, kunden godkjenner på
    kundesiden. Bygger på beslutningene som finnes i dag.
-5. **Utskrift/PDF av fremdriftsplanen** – det finnes en enkel `@media print` i `stil.css`
+4. **Utskrift/PDF av fremdriftsplanen** – det finnes en enkel `@media print` i `stil.css`
    (skjuler meny og knapper), men Gantt-planen deles ikke pent over sider og kundesiden har
    ingen egen utskriftsstil. Liggende A3/A4 med fag og uker på hver side.
-6. **Leverandørsiden uten nett** – vis sist hentede oppgaver når dekningen er dårlig
+5. **Leverandørsiden uten nett** – vis sist hentede oppgaver når dekningen er dårlig
    på byggeplassen, og send ferdigmeldinger når nettet er tilbake.
-7. **Kalender for prosjektlederen** – samme abonnement med milepæler, sjekkpunkter
+6. **Kalender for prosjektlederen** – samme abonnement med milepæler, sjekkpunkter
    (mandag/fredag) og frister i alle prosjekter, og vis på kalenderkortet om kalenderen er på.
-8. **Mangelliste ved overtakelse, del 2** – utskrift/PDF av mangellisten til
+7. **Mangelliste ved overtakelse, del 2** – utskrift/PDF av mangellisten til
    overtakelsesprotokollen, og at kunden kan melde inn mangler selv fra kundesiden
    (som prosjektlederen godkjenner før de går til faget).
+8. **Dagbok, del 2** – hent været automatisk fra MET (api.met.no, gratis, ingen nøkkel) ut
+   fra prosjektadressen, og utskrift/PDF av dagboken for en periode (dokumentasjon ved tvist).
 
 ## Krever avklaring med Benjamin
 
@@ -62,3 +62,6 @@ Bygglet m.fl.), tilpasset små byggefirma og håndverkere.
 - 2026-10: Mangelliste: prosjektlederen registrerer mangler med rom, fag, frist og bilde,
   faget melder utbedret (med kommentar og bilde) fra oppgavesiden, prosjektlederen
   godkjenner eller sender tilbake. Kunden ser åpne og utbedrede mangler.
+- 2026-10: Dagbok på prosjektet: én side per dag med vær, temperatur, bemanning per fag
+  (forslag fra oppgavene som pågår), hva som ble gjort, interne avvik og bilder. En dag kan
+  deles med kunden som oppdatering, uten avvik og bemanning.

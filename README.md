@@ -45,6 +45,9 @@ interne merknader eller hvem som er ansvarlig.
   rom, fag, frist og bilde. Faget ser dem på oppgavesiden og melder utbedret med kommentar og
   bilde; prosjektlederen godkjenner eller sender tilbake. Kunden ser bare om en mangel er åpen
   eller utbedret.
+- **Dagbok** (fanen i prosjektet): én side per dag med vær, bemanning per fag, hva som ble gjort,
+  avvik og bilder. Dagboken er intern; «Del med kunden» gjør en dag om til en oppdatering på
+  kundesiden, uten avvik og bemanning.
 - **Kalenderabonnement**: ansatte og leverandører trykker «Legg i kalenderen» på siden med
   oppgavene sine og får en personlig kalenderadresse (.ics) for iPhone, Google Kalender eller
   Outlook. Egne oppgaver og viktige datoer (fast dato, innflytting, sluttfrist) kommer inn som

@@ -146,7 +146,7 @@ button { font: inherit; color: inherit; }
 .felt { display: grid; gap: 6px; }
 .felt > span { font-size: 12.5px; font-weight: 600; color: var(--fg-2); }
 .felt > small { color: var(--muted); font-size: 12px; }
-input[type=text], input[type=email], input[type=password], input[type=date], input[type=tel], input[type=search], select, textarea {
+input[type=text], input[type=email], input[type=password], input[type=date], input[type=tel], input[type=search], input[type=number], select, textarea {
   width: 100%; height: var(--kontroll); padding: 0 12px; border-radius: var(--r-sm);
   border: 1px solid var(--line); background: var(--surface); color: var(--fg); font: inherit; font-size: 14.5px;
   transition: border-color .12s, box-shadow .12s;
@@ -578,6 +578,40 @@ body.har-modal { overflow: hidden; }
 .mangel-bildevalg { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
 .mangel-kort .mangel-bilde { width: 100%; height: 160px; }
 .mangel-ferdige summary { cursor: pointer; list-style: none; margin-bottom: 12px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+/* Dagbok */
+.db-oppsett { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+.db-skjema { padding: 20px 22px; }
+.db-dato { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.db-dato .felt { margin: 0; }
+.db-dato input { width: auto; }
+.db-dato strong { margin-left: 6px; }
+.db-bemanning { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.db-folk { display: flex; align-items: center; gap: 8px; background: var(--surface-3); border-radius: var(--r-sm); padding: 6px 6px 6px 12px; font-size: 13.5px; }
+.db-folk span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.db-folk input[type=number] { width: 72px; text-align: center; padding-left: 6px; padding-right: 6px; }
+.db-nytt-fag { grid-column: span 2; }
+.db-nytt-fag input[type=text] { flex: 1; min-width: 0; }
+.db-bilder { display: flex; flex-wrap: wrap; gap: 8px; }
+.db-bilder:empty { display: none; }
+.db-bilde { position: relative; width: 84px; height: 84px; border-radius: var(--r-sm); overflow: hidden; background: var(--surface-3); }
+.db-bilde img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.db-bilde .ikon-knapp { position: absolute; top: 4px; right: 4px; width: 26px; height: 26px; background: rgba(22,33,44,.7); color: #fff; border-radius: 50%; }
+.db-bilde.velg input { position: absolute; top: 6px; right: 6px; width: 20px; height: 20px; }
+.db-liste { list-style: none; margin: 0; padding: 0; }
+.db-liste li { border-top: 1px solid var(--line-soft); }
+.db-liste li:first-child { border-top: 0; }
+.db-liste li.valgt { background: var(--surface-3); }
+.db-liste button { all: unset; box-sizing: border-box; display: flex; gap: 14px; width: 100%; padding: 12px 16px; cursor: pointer; }
+.db-liste button:hover { background: var(--surface-3); }
+.db-liste button:focus-visible { outline: 2px solid var(--signal); outline-offset: -2px; }
+.db-liste-dato { display: grid; min-width: 58px; }
+.db-liste-dato small { color: var(--muted); font-size: 12px; text-transform: capitalize; }
+.db-liste-tekst { display: grid; gap: 4px; min-width: 0; }
+.db-liste-tekst .meta { display: flex; gap: 12px; flex-wrap: wrap; }
+.db-liste-tekst .meta .ikon { width: 14px; height: 14px; vertical-align: -2px; }
+.db-utdrag { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+@media (max-width: 960px) { .db-oppsett { grid-template-columns: 1fr; } }
 .k-apen { width: 26px; height: 26px; box-sizing: border-box; border-radius: 50%; border: 2px solid var(--varsel-fg); flex: none; }
 @media (max-width: 640px) {
   .mangel-hode { flex-direction: column; }
@@ -902,7 +936,7 @@ body.kundeside { background: #f4f2ed; font-size: 15px; }
 
 @media (max-width: 860px) {
   /* 16 px i skjemafelt: ellers zoomer iPhone inn når man trykker i feltet. */
-  input[type=text], input[type=email], input[type=password], input[type=date], input[type=tel], input[type=search], select, textarea { font-size: 16px; }
+  input[type=text], input[type=email], input[type=password], input[type=date], input[type=tel], input[type=search], input[type=number], select, textarea { font-size: 16px; }
 
   /* Hakket på iPhone og hjemskjerm-modus. */
   .mobil-topp { padding-top: calc(10px + env(safe-area-inset-top)); padding-left: calc(14px + env(safe-area-inset-left)); }
