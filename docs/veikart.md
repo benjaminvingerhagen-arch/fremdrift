@@ -9,27 +9,25 @@ Bygglet m.fl.), tilpasset små byggefirma og håndverkere.
 
 ## Neste
 
-1. **Kalenderabonnement for ansatte og leverandører** – en hemmelig kalenderlenke
-   (.ics) fra «mine», så egne oppgaver og viktige datoer havner i kalenderen på
-   telefonen og oppdateres av seg selv. Lenken lagres som hash, slutter å virke når
-   personen får ny lenke eller deaktiveres. Delt kalender er standard hos Fieldwire m.fl.
-2. **Mangelliste ved overtakelse** – egne punkter knyttet til et rom eller en oppgave,
+1. **Mangelliste ved overtakelse** – egne punkter knyttet til et rom eller en oppgave,
    med bilde, ansvarlig fag og frist. Leverandøren ser sine punkter på «mine», kunden ser
    status. Typisk sluttfase-verktøy hos Fieldwire og Buildertrend.
-3. **Dagbok på prosjektet** – kort notat per dag med bemanning, vær, avvik og bilder.
+2. **Dagbok på prosjektet** – kort notat per dag med bemanning, vær, avvik og bilder.
    Gir dokumentasjon ved uenighet om fremdrift. Kan velges om skal vises for kunden.
-4. **Utkast til ukesoppdatering for kunden** – fredag lages et forslag til oppdatering ut
+3. **Utkast til ukesoppdatering for kunden** – fredag lages et forslag til oppdatering ut
    fra ukens godkjente oppgaver og bilder, som prosjektlederen retter og publiserer.
-5. **Avhengigheter mellom oppgaver** – «starter når X er ferdig», og tilbud om å flytte
+4. **Avhengigheter mellom oppgaver** – «starter når X er ferdig», og tilbud om å flytte
    bare de etterfølgende oppgavene når én oppgave flyttes (i dag kan planen forskyves for
    ett fag eller alle fag fra en valgt dato).
-6. **Tilleggsarbeid som kunden godkjenner** – beskrivelse og pris, kunden godkjenner på
+5. **Tilleggsarbeid som kunden godkjenner** – beskrivelse og pris, kunden godkjenner på
    kundesiden. Bygger på beslutningene som finnes i dag.
-7. **Utskrift/PDF av fremdriftsplanen** – det finnes en enkel `@media print` i `stil.css`
+6. **Utskrift/PDF av fremdriftsplanen** – det finnes en enkel `@media print` i `stil.css`
    (skjuler meny og knapper), men Gantt-planen deles ikke pent over sider og kundesiden har
    ingen egen utskriftsstil. Liggende A3/A4 med fag og uker på hver side.
-8. **Leverandørsiden uten nett** – vis sist hentede oppgaver når dekningen er dårlig
+7. **Leverandørsiden uten nett** – vis sist hentede oppgaver når dekningen er dårlig
    på byggeplassen, og send ferdigmeldinger når nettet er tilbake.
+8. **Kalender for prosjektlederen** – samme abonnement med milepæler, sjekkpunkter
+   (mandag/fredag) og frister i alle prosjekter, og vis på kalenderkortet om kalenderen er på.
 
 ## Krever avklaring med Benjamin
 
@@ -59,3 +57,5 @@ Bygglet m.fl.), tilpasset små byggefirma og håndverkere.
   leverandørbilder til kundesiden, installerbar app for alle (leverandører får egen
   startadresse rett til oppgavene), mobiltilpasninger med bunnmeny.
 - 2026-10: Lås rundt databasemigreringen etter deadlock ved samtidige kaldstarter.
+- 2026-10: Kalenderabonnement for ansatte og leverandører: personlig .ics-adresse fra
+  «mine» med egne oppgaver og viktige datoer, knapper for iPhone, Google og Outlook.

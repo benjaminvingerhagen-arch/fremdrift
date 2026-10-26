@@ -9,6 +9,7 @@ import './_lib/routes/prosjekter.js';
 import './_lib/routes/oppgaver.js';
 import './_lib/routes/kunde.js';
 import './_lib/routes/vedlegg.js';
+import './_lib/routes/kalender.js';
 import './_lib/routes/varsler.js';
 
 function routePath(req) {

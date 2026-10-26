@@ -1,5 +1,5 @@
 import { api } from '../api.js';
-import { html, icon, LOGO, $, $$, modal, attempt, toast, avatar } from '../ui.js';
+import { html, icon, LOGO, $, $$, modal, attempt, toast, avatar, kopier, bekreft } from '../ui.js';
 import { store } from '../store.js';
 import { skrivFelt, lastTraad } from './oppgave.js';
 import { iDag, oppgaveStatus, STATUS, dagerMellom, datoMedDag, datoKort, ddmm, isoUke } from '/shared/plan.js';
@@ -78,6 +78,11 @@ export async function mineApp(root) {
       ${seksjon('Meldt ferdig', grupper.meldt, 'checkCircle')}
       ${grupper.ferdig.length ? html`<details><summary class="gruppe-tittel" style="cursor:pointer;list-style:none">${icon('check')} Godkjent <span class="mono">${grupper.ferdig.length}</span> <span class="muted" style="text-transform:none;letter-spacing:0;font-weight:500">– vis</span></summary>
         <div style="display:grid;gap:16px;margin-top:14px">${grupper.ferdig.map(kort)}</div></details>` : ''}
+      <div class="kort kalender-kort">
+        <span class="kalender-ikon">${icon('calendar')}</span>
+        <div><strong>Oppgavene i kalenderen din</strong><p class="small muted">Få oppgavene og viktige datoer rett i kalenderen på telefonen. Den oppdateres av seg selv når planen endres.</p></div>
+        <button class="knapp" data-kalender>${icon('calendar')} Legg i kalenderen</button>
+      </div>
       <p class="muted xs" style="text-align:center;margin-top:14px">Denne siden er bare for deg. Ikke del lenken med andre.</p>
     </main>
   </div>`.toString();
@@ -98,6 +103,7 @@ export async function mineApp(root) {
       if (await attempt(() => api.post(`/oppgaver/${b.dataset.angre}/meld`, { ferdig: false }), 'Ferdigmeldingen er trukket tilbake')) mineApp(root);
     }),
   );
+  $('[data-kalender]', root)?.addEventListener('click', () => kalenderDialog());
   $$('[data-traad]', root).forEach((b) =>
     b.addEventListener('click', async () => {
       const o = finn(b.dataset.traad);
@@ -111,4 +117,67 @@ export async function mineApp(root) {
       mineApp(root);
     }),
   );
+}
+
+// ---------- Kalenderabonnement ----------
+// Adressen vises bare når den lages (serveren lagrer bare en hash). Trenger man den
+// igjen, lager man en ny, og da slutter den gamle å virke.
+
+function kalenderValg(adresse) {
+  const webcal = adresse.replace(/^https?:/, 'webcal:');
+  const google = `https://calendar.google.com/calendar/render?cid=${encodeURIComponent(webcal)}`;
+  const outlook = `https://outlook.live.com/calendar/0/addfromweb?url=${encodeURIComponent(adresse)}&name=${encodeURIComponent('Fremdrift')}`;
+  return html`<div class="skjema">
+    <p class="small">Velg kalenderen du bruker. Oppgavene kommer inn som heldagshendelser og oppdateres av seg selv.</p>
+    <div class="kalender-valg">
+      <a class="knapp primar" href="${webcal}">${icon('calendar')} iPhone, iPad og Mac</a>
+      <a class="knapp" href="${google}" target="_blank" rel="noopener">${icon('calendar')} Google Kalender (Android)</a>
+      <a class="knapp" href="${outlook}" target="_blank" rel="noopener">${icon('calendar')} Outlook</a>
+    </div>
+    <p class="small muted">Annen kalender? Kopier adressen og velg «Legg til kalender fra URL» eller «Abonner».</p>
+    <div class="lenkeboks"><code>${adresse}</code><button class="knapp liten" data-kopier type="button">${icon('copy')} Kopier</button></div>
+    <p class="xs muted">Adressen er bare for deg og vises bare nå. Den gir ikke tilgang til å endre noe.</p>
+    <div class="knapperad"><span class="spacer"></span><button class="knapp" data-lukk type="button">Ferdig</button></div>
+  </div>`;
+}
+
+async function kalenderDialog() {
+  const status = await attempt(() => api.get('/mine/kalender'));
+  if (!status) return;
+  await modal({
+    tittel: 'Oppgavene i kalenderen',
+    undertittel: 'Fungerer med kalenderen på iPhone, Android og PC',
+    innhold: html`<div id="kalender-innhold">${status.aktiv
+      ? html`<div class="skjema">
+          <p class="small">${icon('checkCircle')} Kalenderen din er koblet til. Endringer i planen kommer inn av seg selv, vanligvis innen et par timer.</p>
+          <p class="small muted">Vil du legge den til på en ny telefon, lager du en ny adresse. Den gamle slutter da å virke, og du må fjerne den fra den gamle kalenderen.</p>
+          <div class="knapperad">
+            <button class="knapp lys" data-av type="button">${icon('x')} Slå av</button>
+            <span class="spacer"></span>
+            <button class="knapp primar" data-ny type="button">${icon('refresh')} Lag ny adresse</button>
+          </div></div>`
+      : html`<div class="skjema">
+          <p class="small">Du får en personlig kalenderadresse som du legger til i kalenderen på telefonen. Der ser du dine oppgaver i alle prosjekter, og datoer som innflytting og sluttfrist.</p>
+          <p class="small muted">For å melde ferdig og sende bilder bruker du fortsatt denne siden.</p>
+          <div class="knapperad"><span class="spacer"></span><button class="knapp primar" data-ny type="button">${icon('calendar')} Lag kalenderadresse</button></div>
+        </div>`}</div>`,
+    onMount: (el, lukk) => {
+      const boks = $('#kalender-innhold', el);
+      $('[data-ny]', el)?.addEventListener('click', async (e) => {
+        e.currentTarget.disabled = true;
+        const ny = await attempt(() => api.post('/mine/kalender'));
+        if (!ny) {
+          e.currentTarget.disabled = false;
+          return;
+        }
+        boks.innerHTML = kalenderValg(ny.adresse).toString();
+        $('[data-kopier]', boks).addEventListener('click', () => kopier(ny.adresse));
+        $('[data-lukk]', boks).addEventListener('click', () => lukk());
+      });
+      $('[data-av]', el)?.addEventListener('click', async () => {
+        if (!(await bekreft('Slå av kalenderen?', 'Oppgavene forsvinner fra kalenderen neste gang den oppdateres. Du kan slå den på igjen senere.', { ok: 'Slå av', fare: true }))) return;
+        if (await attempt(() => api.del('/mine/kalender'), 'Kalenderen er slått av')) lukk();
+      });
+    },
+  });
 }

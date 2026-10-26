@@ -154,6 +154,29 @@ sjekk('godkjente oppgaver flyttes ikke', (await leder('GET', `/prosjekter/${p.id
 sjekk('0 dager avvises', (await leder('POST', `/prosjekter/${p.id}/forskyv`, { fra: '2026-10-01', dager: 0 })).status === 400);
 sjekk('leverandør kan ikke forskyve', (await lev2('POST', `/prosjekter/${p.id}/forskyv`, { fra: '2026-10-01', dager: 1 })).status === 403);
 
+console.log('Kalenderabonnement:');
+const hentIcs = (adr) => fetch(adr.replace(/^https?:\/\/[^/]+/, BASE)).then(async (r) => ({ status: r.status, type: r.headers.get('content-type'), tekst: await r.text() }));
+sjekk('kalenderen er av fra start', (await lev2('GET', '/mine/kalender')).data?.aktiv === false);
+sjekk('uten innlogging kan ingen lage kalender', (await klient()('POST', '/mine/kalender')).status === 401);
+sjekk('prosjektleder bruker planen, ikke kalenderen', (await leder('POST', '/mine/kalender')).status === 400);
+const kal = (await lev2('POST', '/mine/kalender')).data;
+sjekk('leverandør får kalenderadresse', /\/api\/kalender\/[\w-]{20,}\.ics$/.test(kal?.adresse || ''), JSON.stringify(kal));
+sjekk('status viser at kalenderen er på', (await lev2('GET', '/mine/kalender')).data?.aktiv === true);
+const ics = await hentIcs(kal.adresse);
+sjekk('kalenderen hentes uten innlogging', ics.status === 200 && ics.type.startsWith('text/calendar'), `${ics.status} ${ics.type}`);
+sjekk('gyldig kalenderfil med CRLF', ics.tekst.startsWith('BEGIN:VCALENDAR\r\n') && ics.tekst.trimEnd().endsWith('END:VCALENDAR'));
+sjekk('egne oppgaver i begge prosjekter er med', ics.tekst.includes('Montering oppe') && ics.tekst.includes('Annet elarbeid'));
+sjekk('heldagshendelse med riktig sluttdag', ics.tekst.includes('DTSTART;VALUE=DATE:20261102') && ics.tekst.includes('DTEND;VALUE=DATE:20261107'));
+sjekk('andres oppgaver er ikke med', !ics.tekst.includes('Tak TV-stue') && !ics.tekst.includes('Fase 1'));
+sjekk('viktige datoer er med', ics.tekst.includes('Innflytting'));
+sjekk('ingen linje over 75 byte', ics.tekst.split('\r\n').every((l) => Buffer.byteLength(l) <= 75));
+sjekk('ugyldig kalenderadresse', (await fetch(`${BASE}/api/kalender/finnes-ikke-xxxxxxxxxxxxxxxxxxxx.ics`)).status === 404);
+const kal2 = (await lev2('POST', '/mine/kalender')).data;
+sjekk('ny kalenderadresse stenger den gamle', (await hentIcs(kal.adresse)).status === 404 && (await hentIcs(kal2.adresse)).status === 200);
+await lev2('DELETE', '/mine/kalender');
+sjekk('kalenderen kan slås av', (await hentIcs(kal2.adresse)).status === 404);
+const kal3 = (await lev2('POST', '/mine/kalender')).data;
+
 console.log('App på hjemskjermen:');
 const man = await fetch(`${BASE}/api/manifest`).then((r) => r.json());
 sjekk('manifest uten innlogging starter på forsiden', man.start_url === '/');
@@ -164,6 +187,7 @@ const app = await klient()('GET', levMan.start_url.replace('/api', ''));
 sjekk('startadressen logger inn', app.headers.get('location') === '/#/mine');
 await leder('POST', `/personer/${el.id}/lenke`);
 sjekk('ny lenke stenger også appens startadresse', (await klient()('GET', levMan.start_url.replace('/api', ''))).headers.get('location') === '/#/ugyldig-lenke');
+sjekk('ny lenke stopper også kalenderen', (await hentIcs(kal3.adresse)).status === 404);
 
 console.log(`\n${ok} bestått, ${feil} feilet`);
 process.exit(feil ? 1 : 0);
