@@ -41,6 +41,10 @@ interne merknader eller hvem som er ansvarlig.
 - **Forskyv planen**: flytt alle åpne oppgaver fra en dato – for ett fag eller alle – et antall
   arbeidsdager frem eller tilbake. Helger hoppes over, godkjente oppgaver blir liggende.
 - **Del bilde med kunden**: bilder leverandøren sender på en oppgave kan legges rett ut på kundesiden.
+- **Mangler** (fanen i prosjektet): registrer feil og rester ved befaring og overtakelse, med
+  rom, fag, frist og bilde. Faget ser dem på oppgavesiden og melder utbedret med kommentar og
+  bilde; prosjektlederen godkjenner eller sender tilbake. Kunden ser bare om en mangel er åpen
+  eller utbedret.
 - **Kalenderabonnement**: ansatte og leverandører trykker «Legg i kalenderen» på siden med
   oppgavene sine og får en personlig kalenderadresse (.ics) for iPhone, Google Kalender eller
   Outlook. Egne oppgaver og viktige datoer (fast dato, innflytting, sluttfrist) kommer inn som

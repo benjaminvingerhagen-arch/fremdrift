@@ -10,6 +10,7 @@ const TYPE = {
   kommentar: { ikon: 'chat', tone: 'aktiv', tekst: 'Melding', fane: '' },
   kundesvar: { ikon: 'help', tone: 'ok', tekst: 'Kundesvar', fane: 'kunde' },
   kunde: { ikon: 'calendar', tone: 'varsel', tekst: 'Kunden', fane: 'plan' },
+  mangel: { ikon: 'checkCircle', tone: 'info', tekst: 'Mangel utbedret', fane: 'mangler' },
 };
 
 function dagOverskrift(ts) {

@@ -80,7 +80,7 @@ route('GET', '/prosjekter/:id', async ({ params, user }) => {
   const id = f.id(params.id);
   const prosjekt = await one('SELECT * FROM prosjekter WHERE id = $1', [id]);
   if (!prosjekt) fail(404, 'Fant ikke prosjektet.');
-  const [oppgaver, milepaeler, sjekk, oppdateringer, beslutninger, folk] = await Promise.all([
+  const [oppgaver, milepaeler, sjekk, oppdateringer, beslutninger, folk, mangler] = await Promise.all([
     q(
       `SELECT o.*, b.navn AS ansvarlig_navn,
               (SELECT COUNT(*)::int FROM kommentarer k WHERE k.oppgave_id = o.id) AS kommentarer,
@@ -96,8 +96,14 @@ route('GET', '/prosjekter/:id', async ({ params, user }) => {
     q('SELECT * FROM oppdateringer WHERE prosjekt_id = $1 ORDER BY publisert DESC', [id]),
     q('SELECT * FROM beslutninger WHERE prosjekt_id = $1 ORDER BY besvart IS NOT NULL, frist NULLS LAST, id', [id]),
     personer(),
+    q(
+      `SELECT m.*, b.navn AS ansvarlig_navn, o.tittel AS oppgave_tittel
+         FROM mangler m LEFT JOIN brukere b ON b.id = m.ansvarlig_id LEFT JOIN oppgaver o ON o.id = m.oppgave_id
+        WHERE m.prosjekt_id = $1 ORDER BY m.godkjent IS NOT NULL, m.frist NULLS LAST, m.id`,
+      [id],
+    ),
   ]);
-  return { prosjekt, oppgaver, milepaeler, sjekkpunkter: sjekk, oppdateringer, beslutninger, personer: folk };
+  return { prosjekt, oppgaver, milepaeler, sjekkpunkter: sjekk, oppdateringer, beslutninger, personer: folk, mangler };
 });
 
 route('PUT', '/prosjekter/:id', async ({ params, body, user }) => {

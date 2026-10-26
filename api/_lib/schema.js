@@ -178,9 +178,34 @@ CREATE TABLE IF NOT EXISTS oppgave_lest (
 
 -- Versjon 4: kalenderabonnement. Bare hash av nøkkelen lagres.
 ALTER TABLE brukere ADD COLUMN IF NOT EXISTS kalender_hash TEXT UNIQUE;
+
+-- Versjon 5: mangelliste. En mangel følger samme gang som en oppgave: registrert av
+-- prosjektleder, meldt utbedret av faget, godkjent eller sendt tilbake av prosjektleder.
+CREATE TABLE IF NOT EXISTS mangler (
+  id SERIAL PRIMARY KEY,
+  prosjekt_id INT NOT NULL REFERENCES prosjekter(id) ON DELETE CASCADE,
+  oppgave_id INT REFERENCES oppgaver(id) ON DELETE SET NULL,
+  tittel TEXT NOT NULL,
+  beskrivelse TEXT,
+  rom TEXT,
+  fag TEXT,
+  ansvarlig_id INT REFERENCES brukere(id) ON DELETE SET NULL,
+  frist DATE,
+  bilde_id INT REFERENCES vedlegg(id) ON DELETE SET NULL,
+  synlig_for_kunde BOOLEAN NOT NULL DEFAULT true,
+  utbedret TIMESTAMPTZ,
+  utbedret_av TEXT,
+  utbedret_kommentar TEXT,
+  utbedret_bilde_id INT REFERENCES vedlegg(id) ON DELETE SET NULL,
+  avvist_grunn TEXT,
+  godkjent TIMESTAMPTZ,
+  opprettet TIMESTAMPTZ NOT NULL DEFAULT now(),
+  endret TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS mangler_prosjekt_idx ON mangler (prosjekt_id);
 `;
 
-const VERSJON = 4;
+const VERSJON = 5;
 let klar = null;
 
 export function ensureSchema() {

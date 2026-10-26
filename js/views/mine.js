@@ -2,6 +2,7 @@ import { api } from '../api.js';
 import { html, icon, LOGO, $, $$, modal, attempt, toast, avatar, kopier, bekreft } from '../ui.js';
 import { store } from '../store.js';
 import { skrivFelt, lastTraad } from './oppgave.js';
+import { mineManglerHtml, kobleMineMangler } from './mangler.js';
 import { iDag, oppgaveStatus, STATUS, dagerMellom, datoMedDag, datoKort, ddmm, isoUke } from '/shared/plan.js';
 
 // Ansatte og leverandører: én side med egne oppgaver på tvers av prosjekter.
@@ -9,7 +10,7 @@ import { iDag, oppgaveStatus, STATUS, dagerMellom, datoMedDag, datoKort, ddmm, i
 
 export async function mineApp(root) {
   document.title = 'Mine oppgaver · Fremdrift';
-  const data = await api.get('/mine');
+  const [data, mangler] = await Promise.all([api.get('/mine'), api.get('/mine/mangler').catch(() => [])]);
   const dag = iDag();
   const me = store.me;
   const grupper = { handling: [], pagar: [], snart: [], senere: [], meldt: [], ferdig: [] };
@@ -70,8 +71,9 @@ export async function mineApp(root) {
         <div class="tall"><span class="etikett">Ferdig</span><span class="verdi">${grupper.ferdig.length + grupper.meldt.length}<small>/${data.oppgaver.length}</small></span></div>
       </div>
       ${viktige.map((m) => html`<div class="viktig-dato">${icon('flag')}<span><strong>${datoMedDag(m.dato)}:</strong> ${m.navn}${flereProsjekter ? ` (${m.prosjekt})` : ''}</span></div>`)}
-      ${!data.oppgaver.length ? html`<div class="kort tom">${icon('checkCircle')} Du har ingen oppgaver akkurat nå.</div>` : ''}
+      ${!data.oppgaver.length && !mangler.length ? html`<div class="kort tom">${icon('checkCircle')} Du har ingen oppgaver akkurat nå.</div>` : ''}
       ${seksjon('Haster – frist i dag eller passert', grupper.handling, 'alert')}
+      ${mineManglerHtml(mangler, dag, flereProsjekter)}
       ${seksjon('Pågår nå', grupper.pagar, 'hammer')}
       ${seksjon('Starter de neste dagene', grupper.snart, 'clock')}
       ${seksjon('Senere', grupper.senere, 'calendar')}
@@ -104,6 +106,7 @@ export async function mineApp(root) {
     }),
   );
   $('[data-kalender]', root)?.addEventListener('click', () => kalenderDialog());
+  kobleMineMangler(root, mangler, () => mineApp(root));
   $$('[data-traad]', root).forEach((b) =>
     b.addEventListener('click', async () => {
       const o = finn(b.dataset.traad);
