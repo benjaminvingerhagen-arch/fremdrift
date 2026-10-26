@@ -9,25 +9,25 @@ Bygglet m.fl.), tilpasset små byggefirma og håndverkere.
 
 ## Neste
 
-1. **Mangelliste ved overtakelse** – egne punkter knyttet til et rom eller en oppgave,
-   med bilde, ansvarlig fag og frist. Leverandøren ser sine punkter på «mine», kunden ser
-   status. Typisk sluttfase-verktøy hos Fieldwire og Buildertrend.
-2. **Dagbok på prosjektet** – kort notat per dag med bemanning, vær, avvik og bilder.
+1. **Dagbok på prosjektet** – kort notat per dag med bemanning, vær, avvik og bilder.
    Gir dokumentasjon ved uenighet om fremdrift. Kan velges om skal vises for kunden.
-3. **Utkast til ukesoppdatering for kunden** – fredag lages et forslag til oppdatering ut
+2. **Utkast til ukesoppdatering for kunden** – fredag lages et forslag til oppdatering ut
    fra ukens godkjente oppgaver og bilder, som prosjektlederen retter og publiserer.
-4. **Avhengigheter mellom oppgaver** – «starter når X er ferdig», og tilbud om å flytte
+3. **Avhengigheter mellom oppgaver** – «starter når X er ferdig», og tilbud om å flytte
    bare de etterfølgende oppgavene når én oppgave flyttes (i dag kan planen forskyves for
    ett fag eller alle fag fra en valgt dato).
-5. **Tilleggsarbeid som kunden godkjenner** – beskrivelse og pris, kunden godkjenner på
+4. **Tilleggsarbeid som kunden godkjenner** – beskrivelse og pris, kunden godkjenner på
    kundesiden. Bygger på beslutningene som finnes i dag.
-6. **Utskrift/PDF av fremdriftsplanen** – det finnes en enkel `@media print` i `stil.css`
+5. **Utskrift/PDF av fremdriftsplanen** – det finnes en enkel `@media print` i `stil.css`
    (skjuler meny og knapper), men Gantt-planen deles ikke pent over sider og kundesiden har
    ingen egen utskriftsstil. Liggende A3/A4 med fag og uker på hver side.
-7. **Leverandørsiden uten nett** – vis sist hentede oppgaver når dekningen er dårlig
+6. **Leverandørsiden uten nett** – vis sist hentede oppgaver når dekningen er dårlig
    på byggeplassen, og send ferdigmeldinger når nettet er tilbake.
-8. **Kalender for prosjektlederen** – samme abonnement med milepæler, sjekkpunkter
+7. **Kalender for prosjektlederen** – samme abonnement med milepæler, sjekkpunkter
    (mandag/fredag) og frister i alle prosjekter, og vis på kalenderkortet om kalenderen er på.
+8. **Mangelliste ved overtakelse, del 2** – utskrift/PDF av mangellisten til
+   overtakelsesprotokollen, og at kunden kan melde inn mangler selv fra kundesiden
+   (som prosjektlederen godkjenner før de går til faget).
 
 ## Krever avklaring med Benjamin
 
@@ -59,3 +59,6 @@ Bygglet m.fl.), tilpasset små byggefirma og håndverkere.
 - 2026-10: Lås rundt databasemigreringen etter deadlock ved samtidige kaldstarter.
 - 2026-10: Kalenderabonnement for ansatte og leverandører: personlig .ics-adresse fra
   «mine» med egne oppgaver og viktige datoer, knapper for iPhone, Google og Outlook.
+- 2026-10: Mangelliste: prosjektlederen registrerer mangler med rom, fag, frist og bilde,
+  faget melder utbedret (med kommentar og bilde) fra oppgavesiden, prosjektlederen
+  godkjenner eller sender tilbake. Kunden ser åpne og utbedrede mangler.

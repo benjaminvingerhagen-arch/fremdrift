@@ -35,7 +35,7 @@ route(
     const dag = iDag();
     const mandag = leggTilDager(dag, -ukedag(dag));
     const sondag = leggTilDager(mandag, 6);
-    const [oppgaver, milepaeler, oppdateringer, beslutninger] = await Promise.all([
+    const [oppgaver, milepaeler, oppdateringer, beslutninger, mangler] = await Promise.all([
       q(
         `SELECT id, fag, tittel, fra, til, ferdig_meldt, godkjent, kunde_styrt, beskrivelse
            FROM oppgaver WHERE prosjekt_id = $1 AND (synlig_for_kunde OR kunde_styrt) ORDER BY fra, sortering, id`,
@@ -46,6 +46,12 @@ route(
       q(
         `SELECT id, sporsmal, beskrivelse, alternativer, frist, svar, svar_kommentar, besvart
            FROM beslutninger WHERE prosjekt_id = $1 ORDER BY besvart IS NOT NULL, frist NULLS LAST, id`,
+        [p.id],
+      ),
+      // Kunden ser bare om en mangel er registrert eller utbedret – ikke frist, ansvarlig eller «meldt utbedret».
+      q(
+        `SELECT id, tittel, rom, (godkjent IS NOT NULL) AS utbedret, godkjent::date AS utbedret_dato
+           FROM mangler WHERE prosjekt_id = $1 AND synlig_for_kunde ORDER BY godkjent IS NOT NULL, opprettet, id`,
         [p.id],
       ),
     ]);
@@ -102,6 +108,7 @@ route(
         .map((o) => ({ id: o.id, fag: o.fag, tittel: o.tittel, beskrivelse: o.beskrivelse, fra: o.fra, til: o.til, levert: Boolean(o.ferdig_meldt), godkjent: Boolean(o.godkjent) })),
       oppdateringer,
       beslutninger,
+      mangler,
     };
   },
   { public: true },

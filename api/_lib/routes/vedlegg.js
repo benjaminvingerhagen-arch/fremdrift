@@ -45,6 +45,9 @@ route(
     if (user.rolle !== 'leder') {
       const har = await one(
         `SELECT 1 FROM oppgaver WHERE prosjekt_id = $1
+            AND (ansvarlig_id = $2 OR (ansvarlig_id IS NULL AND $3::text IS NOT NULL AND lower(fag) = lower($3::text)))
+         UNION ALL
+         SELECT 1 FROM mangler WHERE prosjekt_id = $1
             AND (ansvarlig_id = $2 OR (ansvarlig_id IS NULL AND $3::text IS NOT NULL AND lower(fag) = lower($3::text))) LIMIT 1`,
         [prosjektId, user.id, user.fag],
       );
@@ -73,11 +76,16 @@ route(
     const v = await one('SELECT * FROM vedlegg WHERE id = $1', [f.id(params.id)]);
     if (!v) fail(404, 'Fant ikke filen.');
     if (user.rolle !== 'leder' && v.opplastet_av !== user.id) {
-      // Andre ser et bilde når det henger ved en kommentar på en av deres egne oppgaver.
+      // Andre ser et bilde når det henger ved en kommentar på en av deres egne oppgaver,
+      // eller er bildet av en mangel de skal utbedre.
       const ok = await one(
         `SELECT 1 FROM kommentarer k JOIN oppgaver o ON o.id = k.oppgave_id
           WHERE k.vedlegg_id = $1
-            AND (o.ansvarlig_id = $2 OR (o.ansvarlig_id IS NULL AND $3::text IS NOT NULL AND lower(o.fag) = lower($3::text))) LIMIT 1`,
+            AND (o.ansvarlig_id = $2 OR (o.ansvarlig_id IS NULL AND $3::text IS NOT NULL AND lower(o.fag) = lower($3::text)))
+         UNION ALL
+         SELECT 1 FROM mangler m
+          WHERE (m.bilde_id = $1 OR m.utbedret_bilde_id = $1)
+            AND (m.ansvarlig_id = $2 OR (m.ansvarlig_id IS NULL AND $3::text IS NOT NULL AND lower(m.fag) = lower($3::text))) LIMIT 1`,
         [v.id, user.id, user.fag],
       );
       if (!ok) fail(403, 'Ingen tilgang til filen.');

@@ -11,7 +11,7 @@ const root = document.getElementById('app');
 
 const ROUTES = [
   [/^\/$/, prosjekterView],
-  [/^\/p\/(\d+)(?:\/(plan|sjekkpunkter|kunde|logg|innstillinger))?$/, prosjektView],
+  [/^\/p\/(\d+)(?:\/(plan|sjekkpunkter|mangler|kunde|logg|innstillinger))?$/, prosjektView],
   [/^\/personer$/, personerView],
   [/^\/varsler$/, varslerView],
 ];

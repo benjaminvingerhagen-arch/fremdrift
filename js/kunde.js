@@ -135,6 +135,15 @@ function tegn(d) {
               ${o.godkjent ? html`<span class="chip ok">Ferdig</span>` : html`<button class="knapp liten" data-egen="${o.id}">${o.levert ? 'Levert ✔' : 'Oppdater'}</button>`}</li>`)}</ul>
           </section>` : ''}
 
+          ${d.mangler?.length ? html`<section class="k-kort">
+            <h2 class="k-tittel">${icon('checkCircle')} Mangler som utbedres <span class="k-merke">${d.mangler.filter((m) => !m.utbedret).length}</span></h2>
+            <p class="k-tekst" style="margin-bottom:12px">Det vi har registrert ved befaring og overtakelse. Hver mangel krysses av når utbedringen er kontrollert.</p>
+            <ul class="k-liste">${d.mangler.map((m) => html`<li>
+              ${m.utbedret ? html`<span class="k-hake">${icon('check')}</span>` : html`<span class="k-apen" aria-hidden="true"></span>`}
+              <div><strong>${m.tittel}</strong><small>${[m.rom, m.utbedret && m.utbedret_dato ? `utbedret ${ddmm(m.utbedret_dato)}` : null].filter(Boolean).join(' · ')}</small></div>
+              <span class="chip ${m.utbedret ? 'ok' : 'varsel'}">${m.utbedret ? 'Utbedret' : 'Åpen'}</span></li>`)}</ul>
+          </section>` : ''}
+
           ${besvart.length ? html`<section class="k-kort">
             <h2 class="k-tittel">${icon('checkCircle')} Dine valg</h2>
             <ul class="k-liste">${besvart.map((b) => html`<li><span class="k-hake">${icon('check')}</span><div><strong>${b.sporsmal}</strong><small>${b.svar}${b.svar_kommentar ? ` – «${b.svar_kommentar}»` : ''}</small></div></li>`)}</ul>

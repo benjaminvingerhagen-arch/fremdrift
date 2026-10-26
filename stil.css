@@ -559,6 +559,32 @@ body.har-modal { overflow: hidden; }
 .kalender-kort .kalender-ikon { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 10px; background: var(--surface-3); color: var(--fg-2); }
 .kalender-kort p { margin-top: 2px; }
 .kalender-valg { display: grid; gap: 8px; }
+/* Mangelliste */
+.mangel-hode { display: flex; gap: 16px; align-items: flex-start; justify-content: space-between; margin-bottom: 18px; }
+.mangel-hode p { max-width: 62ch; }
+.mangelliste { list-style: none; margin: 0 0 22px; padding: 0; }
+.mangel { display: grid; grid-template-columns: auto 1fr auto; gap: 14px; align-items: start; padding: 14px 18px; border-top: 1px solid var(--line-soft); }
+.mangel:first-child { border-top: 0; }
+.mangel.ferdig { opacity: .7; }
+.mangel-tekst { display: grid; gap: 6px; min-width: 0; }
+.mangel-topp { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.mangel .meta { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }
+.mangel .meta .ikon { width: 14px; height: 14px; vertical-align: -2px; }
+.mangel-knapper { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.mangel-utbedret { background: var(--info-bg); border-radius: var(--r-sm); padding: 10px 12px; display: grid; gap: 8px; }
+.mangel-bilde { display: block; width: 72px; height: 72px; border-radius: var(--r-sm); overflow: hidden; background: var(--surface-3); flex: none; }
+.mangel-bilde img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.mangel:not(:has(.mangel-bilde:first-child)) { grid-template-columns: 1fr auto; }
+.mangel-bildevalg { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.mangel-kort .mangel-bilde { width: 100%; height: 160px; }
+.mangel-ferdige summary { cursor: pointer; list-style: none; margin-bottom: 12px; }
+.k-apen { width: 26px; height: 26px; box-sizing: border-box; border-radius: 50%; border: 2px solid var(--varsel-fg); flex: none; }
+@media (max-width: 640px) {
+  .mangel-hode { flex-direction: column; }
+  .mangel, .mangel:not(:has(.mangel-bilde:first-child)) { grid-template-columns: 1fr; }
+  .mangel-bilde { width: 100%; height: 160px; }
+  .mangel-knapper { justify-content: flex-start; }
+}
 .kalender-valg .knapp { justify-content: flex-start; }
 @media (max-width: 640px) {
   .kalender-kort { grid-template-columns: auto 1fr; }

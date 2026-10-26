@@ -126,3 +126,20 @@ export function sjekkpunkter(start, slutt) {
 export const PRIORITETER = ['kritisk', 'hoy', 'normal', 'tentativ'];
 export const PRIORITET_TEKST = { kritisk: 'Kritisk', hoy: 'Høy', normal: 'Normal', tentativ: 'Tentativ' };
 export const MILEPAEL_TYPER = { start: 'Start', delmal: 'Delmål', fast: 'Fast', innflytting: 'Innflytting', sluttfrist: 'Sluttfrist' };
+
+// ---------- Mangler ----------
+// Samme gang som en oppgave: åpen → meldt utbedret av faget → godkjent av prosjektleder.
+
+export const MANGEL_STATUS = {
+  godkjent: { tekst: 'Utbedret', tone: 'ok' },
+  utbedret: { tekst: 'Meldt utbedret', tone: 'info' },
+  forsinket: { tekst: 'Over fristen', tone: 'fare' },
+  apen: { tekst: 'Åpen', tone: 'varsel' },
+};
+
+export function mangelStatus(m, dato = iDag()) {
+  if (m.godkjent) return 'godkjent';
+  if (m.utbedret) return 'utbedret';
+  if (m.frist && m.frist < dato) return 'forsinket';
+  return 'apen';
+}

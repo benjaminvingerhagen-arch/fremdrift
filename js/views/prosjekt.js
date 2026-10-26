@@ -1,5 +1,6 @@
 import { api } from '../api.js';
 import { html, raw, icon, $, $$, bar, progressRing, modal, attempt, formData, bekreft, kopier, toast, avatar, kobleDatoer } from '../ui.js';
+import { manglerFane } from './mangler.js';
 import { fagHue, store } from '../store.js';
 import { oppfrisk } from '../app.js';
 import { lesFremdriftsplan } from '../regneark.js';
@@ -13,6 +14,7 @@ const FANER = [
   ['', 'Oversikt', 'home'],
   ['plan', 'Fremdriftsplan', 'gantt'],
   ['sjekkpunkter', 'Sjekkpunkter', 'checkCircle'],
+  ['mangler', 'Mangler', 'alert'],
   ['kunde', 'Kundeside', 'eye'],
   ['logg', 'Logg', 'clock'],
   ['innstillinger', 'Innstillinger', 'settings'],
@@ -30,6 +32,7 @@ export async function prosjektView(el, id, fane = '', erAktuell = () => true) {
   const dag = iDag();
   const fr = fremdrift(oppgaver);
   const venter = oppgaver.filter((o) => !o.godkjent && o.ferdig_meldt);
+  const manglerTilKontroll = (data.mangler || []).filter((m) => m.utbedret && !m.godkjent).length;
   const nyeSvar = data.beslutninger.filter((b) => b.besvart && dagerMellom(b.besvart.slice(0, 10), dag) <= 7).length;
   const ctx = { ...data, dag, onEndret: () => prosjektView(el, id, fane, erAktuell).then(oppfrisk) };
 
@@ -50,7 +53,8 @@ export async function prosjektView(el, id, fane = '', erAktuell = () => true) {
     <nav class="faner">${FANER.map(
       ([k, navn, ik]) => html`<a href="#/p/${p.id}${k ? `/${k}` : ''}" class="${(fane || '') === k ? 'aktiv' : ''}">${icon(ik)} ${navn}
         ${k === '' && venter.length ? html`<span class="teller lilla">${venter.length}</span>` : ''}
-        ${k === 'kunde' && nyeSvar ? html`<span class="teller">${nyeSvar}</span>` : ''}</a>`,
+        ${k === 'kunde' && nyeSvar ? html`<span class="teller">${nyeSvar}</span>` : ''}
+        ${k === 'mangler' && manglerTilKontroll ? html`<span class="teller lilla">${manglerTilKontroll}</span>` : ''}</a>`,
     )}</nav>
     <section id="fane"></section>`.toString();
   $('[data-ny-oppgave]', el).addEventListener('click', () => aapneOppgave(null, ctx));
@@ -68,6 +72,7 @@ export async function prosjektView(el, id, fane = '', erAktuell = () => true) {
   if (!fane) return oversikt(f, ctx, fr, venter);
   if (fane === 'plan') return plan(f, ctx);
   if (fane === 'sjekkpunkter') return sjekkFane(f, ctx);
+  if (fane === 'mangler') return manglerFane(f, ctx);
   if (fane === 'kunde') return kundeFane(f, ctx);
   if (fane === 'logg') return loggFane(f, ctx);
   if (fane === 'innstillinger') return innstillinger(f, ctx);
