@@ -188,7 +188,16 @@ export function ensureSchema() {
         const v = await one(`SELECT verdi FROM innstillinger WHERE nokkel = 'skjemaversjon'`);
         if (Number(v?.verdi) >= VERSJON) return;
       }
+      // Når en ny versjon starter, kommer gjerne flere forespørsler samtidig, hver i sin
+      // serverinstans. Uten lås prøver alle å endre tabellene på én gang og låser hverandre
+      // (deadlock). Låsen slipper én gjennom; de andre venter og ser at jobben er gjort.
       await transaction(async (tx) => {
+        await tx.q('SELECT pg_advisory_xact_lock(482917)');
+        const tabell = await tx.q(`SELECT to_regclass('innstillinger') AS t`);
+        if (tabell[0]?.t) {
+          const v = await tx.q(`SELECT verdi FROM innstillinger WHERE nokkel = 'skjemaversjon'`);
+          if (Number(v[0]?.verdi) >= VERSJON) return;
+        }
         await tx.exec(SCHEMA);
         await tx.q(
           `INSERT INTO innstillinger (nokkel, verdi) VALUES ('skjemaversjon', $1::jsonb)
