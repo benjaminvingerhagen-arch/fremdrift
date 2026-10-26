@@ -27,9 +27,11 @@ npm test                        # i et annet vindu, mot dev-serveren på tom dat
   ingenting = bare prosjektleder. Nye ruter skal ha minst mulig tilgang.
 - Endringer (ikke GET) krever headeren `X-FD: 1` og samme opprinnelse (CSRF-vern).
 - Felter fra klienten leses med `readFields(body, SPEC)` og konverterne i `f` (`api/_lib/http.js`).
-- Databaseskjemaet ligger i `api/_lib/schema.js`. Ved endring: øk `VERSJON` og legg til
-  `ALTER TABLE ... ADD COLUMN IF NOT EXISTS` (aldri endre eksisterende `CREATE TABLE`
-  slik at gamle databaser ikke får kolonnen).
+- Databaseskjemaet ligger i `api/_lib/schema.js`. Ved endring: øk `VERSJON` og legg
+  `ALTER TABLE ... ADD COLUMN IF NOT EXISTS` / nye `CREATE TABLE IF NOT EXISTS` nederst i
+  `SCHEMA` (aldri endre eksisterende `CREATE TABLE`, da får ikke gamle databaser kolonnen).
+- Varsler i appen lages via `logg` med `type` (se `api/_lib/routes/varsler.js`). E-post går
+  gjennom `api/_lib/epost.js` (Resend) og er valgfritt: alt skal virke uten `RESEND`.
 - `shared/plan.js` har reglene for status, sjekkpunkter og fremdrift. Brukes av både server og nettleser.
 - HTML lages med `html`-malen i `js/ui.js`, som escaper verdier. Ikke bruk `innerHTML` med rå tekst.
 - Utseende ligger i `stil.css`, med fargene som tokens øverst. Gjenbruk klassene som finnes

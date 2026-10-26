@@ -21,17 +21,16 @@ Bygglet m.fl.), tilpasset små byggefirma og håndverkere.
 4. **Utkast til ukesoppdatering for kunden** – fredag lages et forslag til oppdatering ut
    fra ukens godkjente oppgaver og bilder, som prosjektlederen retter og publiserer.
 5. **Avhengigheter mellom oppgaver** – «starter når X er ferdig», og tilbud om å flytte
-   etterfølgende oppgaver når en oppgave flyttes i planen.
+   bare de etterfølgende oppgavene når én oppgave flyttes (i dag kan hele planen forskyves).
 6. **Tilleggsarbeid som kunden godkjenner** – beskrivelse og pris, kunden godkjenner på
    kundesiden. Bygger på beslutningene som finnes i dag.
 7. **Utskrift/PDF av fremdriftsplanen** – egen utskriftsstil for planen og kundesiden.
-8. **Leverandørsiden som app på telefonen** – manifest og ikon så siden kan legges på
-   hjemskjermen, og enkel visning uten nett.
+8. **Leverandørsiden uten nett** – vis sist hentede oppgaver når dekningen er dårlig
+   på byggeplassen, og send ferdigmeldinger når nettet er tilbake.
 
 ## Krever avklaring med Benjamin
 
-- **Varsler på e-post eller SMS** (ny oppgave, sendt tilbake, kunden har svart). Krever en
-  e-post-/SMS-tjeneste med egen nøkkel og eventuelt kostnad.
+- **SMS-varsler** i tillegg til e-post. Krever en SMS-tjeneste med egen nøkkel og kostnad.
 
 ## Teknisk gjeld
 
@@ -41,4 +40,6 @@ Bygglet m.fl.), tilpasset små byggefirma og håndverkere.
 
 ## Gjort
 
-- (ingenting ennå)
+- 2026-10: Varsler for prosjektleder med teller i menyen, merke for uleste meldinger,
+  valgfrie e-postvarsler (Resend), forskyv hele planen, del leverandørbilder til
+  kundesiden, installerbar app for leverandører, mobiltilpasninger.
