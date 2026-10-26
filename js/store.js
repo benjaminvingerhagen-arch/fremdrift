@@ -4,6 +4,8 @@ export const store = {
   me: null,
   firma: '',
   prosjekter: [],
+  uleste: 0,
+  epost: false,
 };
 
 export async function lastProsjekter() {

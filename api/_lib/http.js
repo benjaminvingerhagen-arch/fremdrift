@@ -95,16 +95,19 @@ export function updateSql(table, spec, id, values, { touch = false } = {}) {
   return [`UPDATE ${table} SET ${sets.join(', ')} WHERE id = $${params.length} RETURNING *`, params];
 }
 
-// hvem: brukeren som gjorde det, eller 'kunde' når det kom fra kundesiden.
-export async function logg(prosjektId, hvem, handling, detaljer = null) {
+// hvem: brukeren som gjorde det, eller 'Kunden' når det kom fra kundesiden.
+// type: settes på hendelser prosjektlederen skal varsles om (se routes/varsler.js).
+export async function logg(prosjektId, hvem, handling, detaljer = null, { type = null, oppgaveId = null } = {}) {
   try {
     const bruker = hvem && typeof hvem === 'object' ? hvem : null;
-    await q('INSERT INTO logg (prosjekt_id, bruker_id, hvem, handling, detaljer) VALUES ($1, $2, $3, $4, $5::jsonb)', [
+    await q('INSERT INTO logg (prosjekt_id, bruker_id, hvem, handling, detaljer, type, oppgave_id) VALUES ($1, $2, $3, $4, $5::jsonb, $6, $7)', [
       prosjektId ?? null,
       bruker?.id ?? null,
       bruker ? bruker.navn : String(hvem || ''),
       handling,
       detaljer ? JSON.stringify(detaljer) : null,
+      type,
+      oppgaveId,
     ]);
   } catch (err) {
     console.error('Kunne ikke skrive til logg', err);

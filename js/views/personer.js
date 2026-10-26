@@ -23,6 +23,9 @@ export async function personerView(el) {
       <p class="small" style="color:var(--brand)"><strong>Slik fordeles arbeidet:</strong> Gi personen et fag (f.eks. «Elektro»). Alle oppgaver i det faget – i alle prosjekter – havner da automatisk på personens liste,
         med mindre du har satt en annen ansvarlig på oppgaven. Leverandøren krysser av når noe er ferdig, og du godkjenner.</p>
     </div>
+    ${!store.epost ? html`<div class="kort" style="padding:14px 20px;margin-bottom:18px;display:flex;gap:12px;align-items:flex-start">
+      ${icon('message')}<p class="small muted"><strong style="color:var(--fg)">E-postvarsler er ikke slått på.</strong> Varslene i appen virker uansett.
+        For e-post: legg inn <span class="mono">RESEND</span> (API-nøkkel fra resend.com) og <span class="mono">MAIL_FROM</span> under Environment Variables i Vercel, og deploy på nytt.</p></div>` : ''}
     <div class="rutenett">
       ${grupper.filter(([, l]) => l.length).map(([tittel, liste]) => html`<div class="kort">
         <div class="kort-topp"><h2>${tittel}</h2><span class="antall">${liste.length}</span></div>
@@ -84,6 +87,9 @@ function skjema(p, sideEl) {
         <small>Alle oppgaver i dette faget går automatisk til denne personen.</small></label>
       <div class="rad2"><label class="felt"><span>Telefon</span><input type="tel" name="telefon" value="${p?.telefon || ''}"></label>
         <label class="felt"><span>E-post</span><input type="email" name="epost" value="${p?.epost || ''}"></label></div>
+      <label class="avkrysning"><input type="checkbox" name="epostvarsel" ${p?.epostvarsel !== false ? 'checked' : ''}>
+        <span>Varsle på e-post<small data-for="ikke-leder">Når oppgaven sendes tilbake eller prosjektlederen skriver en melding. Krever e-postadresse.</small>
+          <small data-for="leder">Når noe meldes ferdig, fagene skriver eller kunden svarer.</small></span></label>
       <label class="felt" data-for="leder"><span>${ny ? 'Passord' : 'Nytt passord (valgfritt)'}</span><input type="password" name="passord" minlength="10" autocomplete="new-password"><small>Prosjektledere logger inn med e-post og passord. Minst 10 tegn.</small></label>
       <div class="knapperad">
         ${!ny && p.id !== store.me.id ? html`<button type="button" class="knapp lys" data-aktiv>${p.aktiv ? 'Deaktiver' : 'Aktiver igjen'}</button>` : ''}

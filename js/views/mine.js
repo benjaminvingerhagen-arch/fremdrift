@@ -41,7 +41,7 @@ export async function mineApp(root) {
         <span class="datoer">${ddmm(o.fra)} – ${ddmm(o.til)}</span>
         ${s !== 'ferdig' && s !== 'meldt' ? html`<span class="${n < 0 ? 'text-fare strong' : ''}">${n < 0 ? `${-n} dager over fristen` : n === 0 ? 'Frist i dag' : `Frist ${datoMedDag(o.til)}`}</span>` : ''}
         ${o.prioritet === 'kritisk' ? html`<span class="prio kritisk">Kritisk</span>` : ''}
-        ${o.kommentarer ? html`<span>${icon('chat')} ${o.kommentarer}</span>` : ''}
+        ${o.uleste ? html`<span class="ulest-merke">${icon('chat')} ${o.uleste === 1 ? 'Ny melding' : `${o.uleste} nye meldinger`}</span>` : o.kommentarer ? html`<span>${icon('chat')} ${o.kommentarer}</span>` : ''}
       </div>
       ${o.merknad ? html`<p class="small" style="color:var(--fg-2)">↳ ${o.merknad}</p>` : ''}
       ${o.beskrivelse ? html`<details><summary class="small muted" style="cursor:pointer">Beskrivelse</summary><p class="small pre" style="margin-top:6px">${o.beskrivelse}</p></details>` : ''}

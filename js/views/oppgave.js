@@ -1,6 +1,6 @@
 import { api } from '../api.js';
 import { html, icon, $, modal, attempt, formData, avatar, bekreft, kobleDatoer, toast } from '../ui.js';
-import { fagHue } from '../store.js';
+import { fagHue, store } from '../store.js';
 import { STATUS, oppgaveStatus, PRIORITET_TEKST, datoMedDag, arbeidsdager } from '/shared/plan.js';
 
 export function statusChip(o, dag) {
@@ -91,7 +91,7 @@ export function aapneOppgave(o, ctx) {
       });
       if (!ny) {
         kobleStatus(el, v, lukk, ctx);
-        lastTraad(el, v, ctx.prosjekt.id);
+        lastTraad(el, v, ctx.prosjekt.id, ctx.prosjekt);
       }
     },
   });
@@ -156,6 +156,26 @@ export async function sendTilbake(o) {
   return attempt(() => api.post(`/oppgaver/${o.id}/avvis`, { grunn }), 'Sendt tilbake');
 }
 
+// Et bilde fra byggeplassen blir en oppdatering på kundesiden.
+async function delMedKunden(prosjekt, o, vedleggId) {
+  await modal({
+    tittel: 'Del bildet med kunden',
+    undertittel: 'Blir en oppdatering på kundesiden.',
+    innhold: html`<form class="skjema" id="del">
+      <img src="${api.filUrl(vedleggId)}" alt="" style="border-radius:12px;max-height:240px;object-fit:cover;width:100%">
+      <label class="felt"><span>Overskrift</span><input type="text" name="tittel" value="${o.tittel}" required></label>
+      <label class="felt"><span>Tekst</span><textarea name="tekst" placeholder="Hva ser kunden på bildet?"></textarea></label>
+      ${prosjekt.kunde_epost && store.epost ? html`<label class="avkrysning"><input type="checkbox" name="varsle_kunde"><span>Send e-post til kunden</span></label>` : ''}
+      <div class="knapperad"><span class="spacer"></span><button type="button" class="knapp" data-lukk>Avbryt</button><button class="knapp primar">Publiser</button></div>
+    </form>`,
+    onMount: (el, lukk) => $('#del', el).addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const d = formData(e.target);
+      if (await attempt(() => api.post(`/prosjekter/${prosjekt.id}/oppdateringer`, { ...d, bilder: [vedleggId] }), 'Bildet ligger nå på kundesiden')) lukk(true);
+    }),
+  });
+}
+
 export function skrivFelt() {
   return html`<form class="skriv" id="skriv">
     <label class="ikon-knapp" title="Legg ved bilde" style="flex:none">${icon('camera')}<input type="file" accept="image/*" class="sr" name="bilde"></label>
@@ -165,7 +185,7 @@ export function skrivFelt() {
   <p class="muted xs" data-vedlagt style="margin-top:6px"></p>`;
 }
 
-export async function lastTraad(el, o, prosjektId) {
+export async function lastTraad(el, o, prosjektId, prosjekt = null) {
   const traad = $('#traad', el);
   const tegn = async () => {
     const liste = await attempt(() => api.get(`/oppgaver/${o.id}/kommentarer`));
@@ -176,11 +196,13 @@ export async function lastTraad(el, o, prosjektId) {
             <div class="av"><strong>${k.av || 'Kunden'}</strong> · ${new Intl.DateTimeFormat('nb-NO', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(k.opprettet))}</div>
             ${k.tekst ? html`<div class="pre">${k.tekst}</div>` : ''}
             ${k.vedlegg_id ? (String(k.vedlegg_type).startsWith('image/')
-              ? html`<a href="${api.filUrl(k.vedlegg_id)}" target="_blank" rel="noopener"><img src="${api.filUrl(k.vedlegg_id)}" alt="Bilde"></a>`
+              ? html`<a href="${api.filUrl(k.vedlegg_id)}" target="_blank" rel="noopener"><img src="${api.filUrl(k.vedlegg_id)}" alt="Bilde"></a>
+                  ${prosjekt && store.me?.rolle === 'leder' ? html`<button type="button" class="knapp liten lys del-kunde" data-del-bilde="${k.vedlegg_id}">${icon('share')} Del med kunden</button>` : ''}`
               : html`<a href="${api.filUrl(k.vedlegg_id)}" target="_blank" rel="noopener">${icon('file')} Vedlegg</a>`) : ''}
           </div></div>`,
         )}`.toString()
       : html`<p class="muted small">Ingen meldinger ennå. Skriv til den som utfører oppgaven – de ser meldingen neste gang de åpner oppgavelisten.</p>`.toString();
+    traad.querySelectorAll('[data-del-bilde]').forEach((b) => b.addEventListener('click', () => delMedKunden(prosjekt, o, Number(b.dataset.delBilde))));
   };
   await tegn();
   const form = $('#skriv', el);

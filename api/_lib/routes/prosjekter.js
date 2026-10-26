@@ -2,8 +2,9 @@ import { route } from '../router.js';
 import { q, one, transaction } from '../db.js';
 import { f, fail, required, readFields, insertSql, updateSql, logg } from '../http.js';
 import { nyNokkel } from '../auth.js';
-import { iDag, PRIORITETER, MILEPAEL_TYPER } from '../../../shared/plan.js';
+import { iDag, PRIORITETER, MILEPAEL_TYPER, flyttArbeidsdager } from '../../../shared/plan.js';
 import { personer } from './personer.js';
+import { varsleKunde } from '../epost.js';
 
 const SPEC = {
   navn: required(f.line(120), 'Prosjektnavn'),
@@ -75,17 +76,20 @@ route('POST', '/prosjekter', async ({ body, user }) => {
   return p;
 });
 
-route('GET', '/prosjekter/:id', async ({ params }) => {
+route('GET', '/prosjekter/:id', async ({ params, user }) => {
   const id = f.id(params.id);
   const prosjekt = await one('SELECT * FROM prosjekter WHERE id = $1', [id]);
   if (!prosjekt) fail(404, 'Fant ikke prosjektet.');
   const [oppgaver, milepaeler, sjekk, oppdateringer, beslutninger, folk] = await Promise.all([
     q(
       `SELECT o.*, b.navn AS ansvarlig_navn,
-              (SELECT COUNT(*)::int FROM kommentarer k WHERE k.oppgave_id = o.id) AS kommentarer
+              (SELECT COUNT(*)::int FROM kommentarer k WHERE k.oppgave_id = o.id) AS kommentarer,
+              (SELECT COUNT(*)::int FROM kommentarer k WHERE k.oppgave_id = o.id
+                 AND k.bruker_id IS DISTINCT FROM $2
+                 AND k.opprettet > COALESCE((SELECT l.tid FROM oppgave_lest l WHERE l.bruker_id = $2 AND l.oppgave_id = o.id), '-infinity')) AS uleste
          FROM oppgaver o LEFT JOIN brukere b ON b.id = o.ansvarlig_id
         WHERE o.prosjekt_id = $1 ORDER BY o.sortering, o.fra, o.id`,
-      [id],
+      [id, user.id],
     ),
     q('SELECT * FROM milepaeler WHERE prosjekt_id = $1 ORDER BY dato, id', [id]),
     q('SELECT dato, utfort, notat FROM sjekkpunkter WHERE prosjekt_id = $1', [id]),
@@ -179,6 +183,36 @@ route('POST', '/prosjekter/:id/import', async ({ params, body, user }) => {
   return resultat;
 });
 
+// Forskyv mange oppgaver på én gang, f.eks. når et fag er forsinket og alt etter må flyttes.
+// Teller arbeidsdager, så en oppgave aldri havner med start eller slutt i en helg.
+// Godkjente oppgaver blir liggende – de er historikk.
+route('POST', '/prosjekter/:id/forskyv', async ({ params, body, user }) => {
+  const id = f.id(params.id);
+  await prosjektFinnes(id);
+  const dager = Number(body.dager);
+  if (!Number.isInteger(dager) || dager === 0 || Math.abs(dager) > 120) fail(400, 'Antall arbeidsdager må være et heltall mellom -120 og 120, og ikke 0.');
+  const fraDato = required(f.date, 'Fra dato')(body.fra);
+  const fag = f.line(60)(body.fag);
+  const ider = Array.isArray(body.oppgaver) ? body.oppgaver.map((x) => f.id(x)).filter(Boolean) : null;
+  const kandidater = await q(
+    `SELECT id, fra, til FROM oppgaver
+      WHERE prosjekt_id = $1 AND godkjent IS NULL AND fra >= $2
+        AND ($3::text IS NULL OR lower(fag) = lower($3::text))
+        AND ($4::int[] IS NULL OR id = ANY($4::int[]))`,
+    [id, fraDato, fag, ider],
+  );
+  await transaction(async (tx) => {
+    for (const o of kandidater) {
+      await tx.q('UPDATE oppgaver SET fra = $1, til = $2, endret = now() WHERE id = $3', [flyttArbeidsdager(o.fra, dager), flyttArbeidsdager(o.til, dager), o.id]);
+    }
+  });
+  await logg(id, user, `Forskjøv ${kandidater.length} oppgaver ${dager > 0 ? `${dager} arbeidsdager frem` : `${-dager} arbeidsdager tilbake`}`, {
+    fag: fag || 'alle fag',
+    fra: fraDato,
+  });
+  return { flyttet: kandidater.length };
+});
+
 // ---------- Milepæler ----------
 route('POST', '/prosjekter/:id/milepaeler', async ({ params, body, user }) => {
   const id = f.id(params.id);
@@ -218,13 +252,20 @@ route('PUT', '/prosjekter/:id/sjekkpunkter/:dato', async ({ params, body, user }
 });
 
 // ---------- Oppdateringer til kunden ----------
-route('POST', '/prosjekter/:id/oppdateringer', async ({ params, body, user }) => {
+route('POST', '/prosjekter/:id/oppdateringer', async ({ req, params, body, user }) => {
   const id = f.id(params.id);
   await prosjektFinnes(id);
   const v = readFields(body, OPPDATERING);
   const [sql, p] = insertSql('oppdateringer', OPPDATERING, v, { prosjekt_id: id, forfatter_id: user.id });
   const rad = await one(sql, p);
   await logg(id, user, `Publiserte oppdatering «${rad.tittel}»`);
+  if (f.bool(body.varsle_kunde)) {
+    const p = await one('SELECT * FROM prosjekter WHERE id = $1', [id]);
+    rad.kunde_varslet = await varsleKunde(req, p, {
+      emne: `${p.navn}: ${rad.tittel}`,
+      tekst: `${rad.tittel}\n\n${rad.tekst || ''}${rad.bilder?.length ? '\n\nDet ligger bilder på prosjektsiden.' : ''}`,
+    });
+  }
   return rad;
 });
 route('PUT', '/oppdateringer/:id', async ({ params, body }) => {
@@ -240,13 +281,20 @@ route('DELETE', '/oppdateringer/:id', async ({ params }) => {
 });
 
 // ---------- Beslutninger kunden skal ta ----------
-route('POST', '/prosjekter/:id/beslutninger', async ({ params, body, user }) => {
+route('POST', '/prosjekter/:id/beslutninger', async ({ req, params, body, user }) => {
   const id = f.id(params.id);
   await prosjektFinnes(id);
   const v = readFields(body, BESLUTNING);
   const [sql, p] = insertSql('beslutninger', BESLUTNING, v, { prosjekt_id: id });
   const rad = await one(sql, p);
   await logg(id, user, `Ba kunden ta stilling til «${rad.sporsmal}»`);
+  if (f.bool(body.varsle_kunde)) {
+    const p = await one('SELECT * FROM prosjekter WHERE id = $1', [id]);
+    rad.kunde_varslet = await varsleKunde(req, p, {
+      emne: `Vi trenger svar fra deg: ${rad.sporsmal}`,
+      tekst: `Hei!\n\nVi trenger svar på «${rad.sporsmal}»${rad.frist ? ` innen ${rad.frist.split('-').reverse().join('.')}` : ''}.${rad.beskrivelse ? `\n\n${rad.beskrivelse}` : ''}\n\nDu svarer direkte på prosjektsiden.`,
+    });
+  }
   return rad;
 });
 route('PUT', '/beslutninger/:id', async ({ params, body }) => {

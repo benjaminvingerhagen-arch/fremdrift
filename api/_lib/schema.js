@@ -160,9 +160,24 @@ CREATE TABLE IF NOT EXISTS logg (
   tidspunkt TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS logg_prosjekt_idx ON logg (prosjekt_id, tidspunkt DESC);
+
+-- Versjon 2: varsler, uleste meldinger og e-postvarsler.
+ALTER TABLE brukere ADD COLUMN IF NOT EXISTS varsler_sett TIMESTAMPTZ;
+ALTER TABLE brukere ADD COLUMN IF NOT EXISTS epostvarsel BOOLEAN NOT NULL DEFAULT true;
+-- Startadressen til appen på hjemskjermen (iPhone deler ikke innlogging med Safari).
+ALTER TABLE brukere ADD COLUMN IF NOT EXISTS app_nokkel TEXT UNIQUE;
+ALTER TABLE logg ADD COLUMN IF NOT EXISTS type TEXT;
+ALTER TABLE logg ADD COLUMN IF NOT EXISTS oppgave_id INT REFERENCES oppgaver(id) ON DELETE SET NULL;
+CREATE INDEX IF NOT EXISTS logg_type_idx ON logg (type, tidspunkt DESC);
+CREATE TABLE IF NOT EXISTS oppgave_lest (
+  bruker_id INT NOT NULL REFERENCES brukere(id) ON DELETE CASCADE,
+  oppgave_id INT NOT NULL REFERENCES oppgaver(id) ON DELETE CASCADE,
+  tid TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (bruker_id, oppgave_id)
+);
 `;
 
-const VERSJON = 1;
+const VERSJON = 3;
 let klar = null;
 
 export function ensureSchema() {

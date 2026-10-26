@@ -1,7 +1,8 @@
 import { route } from '../router.js';
 import { q, one } from '../db.js';
 import { f, fail, required } from '../http.js';
-import { checkPasswordStrength, createSession, destroySession, hashPassword, login, loginMedLenke } from '../auth.js';
+import { epostSattOpp } from '../epost.js';
+import { checkPasswordStrength, createSession, destroySession, hashPassword, login, loginMedLenke, nyNokkel } from '../auth.js';
 
 export async function firmanavn() {
   const rad = await one(`SELECT verdi FROM innstillinger WHERE nokkel = 'firmanavn'`);
@@ -13,7 +14,7 @@ route(
   '/me',
   async ({ user }) => {
     const harLeder = await one(`SELECT 1 FROM brukere WHERE rolle = 'leder' LIMIT 1`);
-    return { user, firma: await firmanavn(), registrering: !harLeder };
+    return { user, firma: await firmanavn(), registrering: !harLeder, epost: epostSattOpp() };
   },
   { public: true },
 );
@@ -82,3 +83,41 @@ route('PUT', '/innstillinger', async ({ body }) => {
   );
   return { firma: navn };
 });
+
+// Web-manifest for «Legg til på hjemskjermen». På iPhone har appen på hjemskjermen sin
+// egen lagring, uten innloggingen fra Safari. En leverandør får derfor en egen startadresse
+// som logger inn av seg selv. Den byttes ut sammen med den personlige lenken.
+route(
+  'GET',
+  '/manifest',
+  async ({ res, user }) => {
+    let start = '/';
+    if (user && user.rolle !== 'leder') {
+      let rad = await one('SELECT app_nokkel FROM brukere WHERE id = $1', [user.id]);
+      if (!rad.app_nokkel) rad = await one('UPDATE brukere SET app_nokkel = $1 WHERE id = $2 RETURNING app_nokkel', [nyNokkel(), user.id]);
+      start = `/api/inn/${rad.app_nokkel}`;
+    }
+    const firma = await firmanavn();
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'application/manifest+json; charset=utf-8');
+    res.setHeader('Cache-Control', 'private, no-store');
+    res.end(
+      JSON.stringify({
+        name: firma ? `Fremdrift · ${firma}` : 'Fremdrift',
+        short_name: 'Fremdrift',
+        start_url: start,
+        scope: '/',
+        display: 'standalone',
+        background_color: '#16212c',
+        theme_color: '#16212c',
+        lang: 'nb-NO',
+        icons: [
+          { src: '/logo/ikon-192.png', sizes: '192x192', type: 'image/png' },
+          { src: '/logo/ikon-512.png', sizes: '512x512', type: 'image/png' },
+          { src: '/logo/ikon-maskerbar-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+        ],
+      }),
+    );
+  },
+  { public: true },
+);

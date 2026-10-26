@@ -5,6 +5,7 @@ import { prosjekterView } from './views/prosjekter.js';
 import { prosjektView } from './views/prosjekt.js';
 import { personerView } from './views/personer.js';
 import { mineApp } from './views/mine.js';
+import { varslerView } from './views/varsler.js';
 
 const root = document.getElementById('app');
 
@@ -12,6 +13,7 @@ const ROUTES = [
   [/^\/$/, prosjekterView],
   [/^\/p\/(\d+)(?:\/(plan|sjekkpunkter|kunde|logg|innstillinger))?$/, prosjektView],
   [/^\/personer$/, personerView],
+  [/^\/varsler$/, varslerView],
 ];
 
 function sti() {
@@ -27,6 +29,7 @@ async function boot() {
     return;
   }
   store.firma = me.firma;
+  store.epost = me.epost;
   if (sti() === '/ugyldig-lenke' && !me.user) return renderUgyldig();
   if (!me.user) return renderLogin(me.registrering);
   store.me = me.user;
@@ -55,6 +58,7 @@ function renderSkall() {
       </div>
       <main class="hoved" id="hoved"></main>
     </div>
+    <nav class="bunnmeny" aria-label="Snarveier"></nav>
   </div>`.toString();
   $('[data-meny]').addEventListener('click', () => document.body.classList.toggle('meny-apen'));
   document.addEventListener('click', (e) => {
@@ -71,6 +75,7 @@ export function tegnMeny() {
   el.innerHTML = html`
     <a class="merkevare" href="#/">${LOGO}<div><strong>Fremdrift</strong><small>${store.firma || 'Prosjektstyring'}</small></div></a>
     <a class="meny-lenke ${s === '/' ? 'aktiv' : ''}" href="#/">${icon('grid')} Alle prosjekter</a>
+    <a class="meny-lenke ${s === '/varsler' ? 'aktiv' : ''}" href="#/varsler">${icon('bell')} Varsler ${store.uleste ? html`<span class="meny-teller">${store.uleste}</span>` : ''}</a>
     <a class="meny-lenke ${s === '/personer' ? 'aktiv' : ''}" href="#/personer">${icon('users')} Folk og leverandører</a>
     ${aktive.length ? html`<div class="meny-overskrift">Pågående prosjekter</div>` : ''}
     ${aktive.map((p) => {
@@ -84,6 +89,15 @@ export function tegnMeny() {
       <div class="hvem"><strong>${store.me.navn}</strong><small>Prosjektleder</small></div>
       <button class="ikon-knapp" data-loggut title="Logg ut" aria-label="Logg ut">${icon('logout')}</button>
     </div>`.toString();
+  const bunn = $('.bunnmeny');
+  if (bunn) {
+    const iProsjekt = s.match(/^\/p\/(\d+)/)?.[1];
+    bunn.innerHTML = html`
+      <a href="#/" class="${s === '/' ? 'aktiv' : ''}">${icon('grid')}<span>Prosjekter</span></a>
+      ${iProsjekt ? html`<a href="#/p/${iProsjekt}/plan" class="${s.endsWith('/plan') ? 'aktiv' : ''}">${icon('gantt')}<span>Plan</span></a>` : ''}
+      <a href="#/varsler" class="${s === '/varsler' ? 'aktiv' : ''}">${icon('bell')}<span>Varsler</span>${store.uleste ? html`<b>${store.uleste}</b>` : ''}</a>
+      <a href="#/personer" class="${s === '/personer' ? 'aktiv' : ''}">${icon('users')}<span>Folk</span></a>`.toString();
+  }
   $('[data-loggut]', el).addEventListener('click', async () => {
     await attempt(() => api.post('/loggut'));
     location.href = '/';
@@ -91,8 +105,17 @@ export function tegnMeny() {
 }
 
 let teller = 0;
+export async function oppdaterVarsler() {
+  const r = await api.get('/varsler/antall').catch(() => null);
+  if (r && r.uleste !== store.uleste) {
+    store.uleste = r.uleste;
+    tegnMeny();
+  }
+}
+
 async function route() {
   document.body.classList.remove('meny-apen');
+  oppdaterVarsler();
   const s = sti();
   const hoved = $('#hoved');
   const min = ++teller;
@@ -177,5 +200,8 @@ export function oppfrisk() {
   return lastProsjekter().then(tegnMeny);
 }
 
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && store.me?.rolle === 'leder') oppdaterVarsler();
+});
 window.addEventListener('error', (e) => toast(e.message || 'Noe gikk galt', 'feil'));
 boot();

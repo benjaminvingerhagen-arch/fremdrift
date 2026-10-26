@@ -41,6 +41,20 @@ export function arbeidsdagEtter(iso, n) {
   return d;
 }
 
+// Flytter en dato n arbeidsdager frem (n > 0) eller tilbake (n < 0). En dato i helgen
+// regnes fra fredagen før, så resultatet alltid blir en arbeidsdag.
+export function flyttArbeidsdager(iso, n) {
+  let d = iso;
+  while (erHelg(d)) d = leggTilDager(d, -1);
+  const steg = n > 0 ? 1 : -1;
+  let igjen = Math.abs(n);
+  while (igjen > 0) {
+    d = leggTilDager(d, steg);
+    if (!erHelg(d)) igjen--;
+  }
+  return d;
+}
+
 export function isoUke(iso) {
   const d = parse(iso);
   d.setUTCDate(d.getUTCDate() - ukedag(iso) + 3);

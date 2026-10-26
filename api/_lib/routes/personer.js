@@ -10,9 +10,10 @@ const SPEC = {
   firma: f.line(100),
   fag: f.line(60),
   rolle: f.oneOf(['leder', 'ansatt', 'leverandor'], 'leverandor'),
+  epostvarsel: (x) => (x === undefined ? true : f.bool(x)),
 };
 
-const KOLONNER = `id, navn, epost, telefon, firma, fag, rolle, aktiv, sist_innom, opprettet, (lenke_hash IS NOT NULL) AS har_lenke`;
+const KOLONNER = `id, navn, epost, telefon, firma, fag, rolle, aktiv, epostvarsel, sist_innom, opprettet, (lenke_hash IS NOT NULL) AS har_lenke`;
 
 export async function personer() {
   return q(`SELECT ${KOLONNER} FROM brukere ORDER BY aktiv DESC, rolle = 'leder' DESC, navn`);
@@ -52,7 +53,7 @@ route('PUT', '/personer/:id', async ({ params, body, user }) => {
 route('POST', '/personer/:id/lenke', async ({ params }) => {
   const id = f.id(params.id);
   const nokkel = nyNokkel();
-  const rad = await one(`UPDATE brukere SET lenke_hash = $1 WHERE id = $2 AND rolle <> 'leder' RETURNING id`, [sha256(nokkel), id]);
+  const rad = await one(`UPDATE brukere SET lenke_hash = $1, app_nokkel = NULL WHERE id = $2 AND rolle <> 'leder' RETURNING id`, [sha256(nokkel), id]);
   if (!rad) fail(404, 'Fant ikke personen, eller personen logger inn med passord.');
   await endSessionsFor(id);
   return { nokkel };

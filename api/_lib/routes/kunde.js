@@ -3,6 +3,7 @@ import { q, one } from '../db.js';
 import { f, fail, required, logg } from '../http.js';
 import { hentFil } from '../lagring.js';
 import { sendFil } from './vedlegg.js';
+import { varsleLedere } from '../epost.js';
 import { firmanavn } from './grunn.js';
 import { iDag, leggTilDager, ukedag, oppgaveStatus } from '../../../shared/plan.js';
 
@@ -109,7 +110,7 @@ route(
 route(
   'POST',
   '/k/:token/beslutninger/:id',
-  async ({ params, body }) => {
+  async ({ req, params, body }) => {
     const p = await prosjektFor(params.token);
     const b = await one('SELECT * FROM beslutninger WHERE id = $1 AND prosjekt_id = $2', [f.id(params.id), p.id]);
     if (!b) fail(404, 'Fant ikke spørsmålet.');
@@ -121,7 +122,12 @@ route(
       'UPDATE beslutninger SET svar = $1, svar_kommentar = $2, besvart = now() WHERE id = $3 RETURNING *',
       [svar, f.str(1000)(body.kommentar), b.id],
     );
-    await logg(p.id, 'Kunden', `Svarte på «${b.sporsmal}»: ${svar}`);
+    await logg(p.id, 'Kunden', `Svarte på «${b.sporsmal}»: ${svar}`, { kommentar: rad.svar_kommentar }, { type: 'kundesvar' });
+    await varsleLedere(req, {
+      emne: `Kunden har svart: ${b.sporsmal} (${p.navn})`,
+      tekst: `${p.kunde_navn || 'Kunden'} har svart på «${b.sporsmal}»:\n\n${svar}${rad.svar_kommentar ? `\n«${rad.svar_kommentar}»` : ''}`,
+      sti: `/#/p/${p.id}/kunde`,
+    });
     return rad;
   },
   { public: true },
@@ -132,7 +138,7 @@ route(
 route(
   'PUT',
   '/k/:token/oppgaver/:id',
-  async ({ params, body }) => {
+  async ({ req, params, body }) => {
     const p = await prosjektFor(params.token);
     const o = await one('SELECT * FROM oppgaver WHERE id = $1 AND prosjekt_id = $2 AND kunde_styrt', [f.id(params.id), p.id]);
     if (!o) fail(404, 'Fant ikke leveransen.');
@@ -148,8 +154,22 @@ route(
         WHERE id = $4 RETURNING id, fra, til, ferdig_meldt`,
       [fra, til, levert, o.id],
     );
-    if (fra !== o.fra || til !== o.til) await logg(p.id, 'Kunden', `Flyttet «${o.tittel}»`, { fra: [o.fra, fra], til: [o.til, til] });
-    if (levert !== Boolean(o.ferdig_meldt)) await logg(p.id, 'Kunden', `${levert ? 'Meldte levert' : 'Angret levert'}: «${o.tittel}»`);
+    const endringer = [];
+    if (fra !== o.fra || til !== o.til) {
+      await logg(p.id, 'Kunden', `Flyttet «${o.tittel}»`, { fra: [o.fra, fra], til: [o.til, til] }, { type: 'kunde', oppgaveId: o.id });
+      endringer.push(`Ny periode: ${fra.split('-').reverse().join('.')} – ${til.split('-').reverse().join('.')} (var ${o.fra.split('-').reverse().join('.')} – ${o.til.split('-').reverse().join('.')})`);
+    }
+    if (levert !== Boolean(o.ferdig_meldt)) {
+      await logg(p.id, 'Kunden', `${levert ? 'Meldte levert' : 'Angret levert'}: «${o.tittel}»`, null, { type: 'kunde', oppgaveId: o.id });
+      endringer.push(levert ? 'Meldt som levert – kontroller og godkjenn.' : 'Ikke levert likevel.');
+    }
+    if (endringer.length) {
+      await varsleLedere(req, {
+        emne: `Kunden har oppdatert ${o.tittel} (${p.navn})`,
+        tekst: `${p.kunde_navn || 'Kunden'} har oppdatert «${o.tittel}»:\n\n${endringer.join('\n')}`,
+        sti: `/#/p/${p.id}/plan`,
+      });
+    }
     return { id: rad.id, fra: rad.fra, til: rad.til, levert: Boolean(rad.ferdig_meldt) };
   },
   { public: true },

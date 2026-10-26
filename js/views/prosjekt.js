@@ -1,12 +1,12 @@
 import { api } from '../api.js';
 import { html, raw, icon, $, $$, bar, progressRing, modal, attempt, formData, bekreft, kopier, toast, avatar, kobleDatoer } from '../ui.js';
-import { fagHue } from '../store.js';
+import { fagHue, store } from '../store.js';
 import { oppfrisk } from '../app.js';
 import { lesFremdriftsplan } from '../regneark.js';
 import { aapneOppgave, statusChip, fagMerke, sendTilbake } from './oppgave.js';
 import {
   iDag, leggTilDager, dagerMellom, ukedag, erHelg, isoUke, arbeidsdager, arbeidsdagEtter,
-  oppgaveStatus, fremdrift, sjekkpunkter, datoKort, datoMedDag, ddmm, DAGNAVN, PRIORITET_TEKST, MILEPAEL_TYPER,
+  oppgaveStatus, fremdrift, sjekkpunkter, datoKort, datoMedDag, ddmm, DAGNAVN, PRIORITET_TEKST, MILEPAEL_TYPER, flyttArbeidsdager,
 } from '/shared/plan.js';
 
 const FANER = [
@@ -19,7 +19,8 @@ const FANER = [
 ];
 
 // Valg i planen huskes mens appen er åpen.
-const planValg = { sok: '', fag: '', vis: 'alle', modus: 'gantt' };
+// På telefon starter planen som liste; Gantt er fortsatt ett trykk unna.
+const planValg = { sok: '', fag: '', vis: 'alle', modus: matchMedia('(max-width: 860px)').matches ? 'liste' : 'gantt' };
 
 export async function prosjektView(el, id, fane = '', erAktuell = () => true) {
   const data = await api.get(`/prosjekter/${id}`);
@@ -53,8 +54,17 @@ export async function prosjektView(el, id, fane = '', erAktuell = () => true) {
     )}</nav>
     <section id="fane"></section>`.toString();
   $('[data-ny-oppgave]', el).addEventListener('click', () => aapneOppgave(null, ctx));
+  // Den valgte fanen skal synes, også når fanene må rulles sidelengs på mobil.
+  $('.faner a.aktiv', el)?.scrollIntoView({ block: 'nearest', inline: 'center' });
 
   const f = $('#fane', el);
+  // Kommer vi fra et varsel, åpnes oppgaven det gjelder.
+  const aapne = sessionStorage.getItem('aapneOppgave');
+  if (aapne) {
+    sessionStorage.removeItem('aapneOppgave');
+    const o = oppgaver.find((x) => x.id === Number(aapne));
+    if (o) setTimeout(() => aapneOppgave(o, ctx), 60);
+  }
   if (!fane) return oversikt(f, ctx, fr, venter);
   if (fane === 'plan') return plan(f, ctx);
   if (fane === 'sjekkpunkter') return sjekkFane(f, ctx);
@@ -78,7 +88,7 @@ function oppgaveRad(o, ctx, { visForutsetning = false, handlinger = false } = {}
     <span class="nr">${o.nr || ''}</span>
     <div class="hva"><strong>${o.tittel}</strong>
       <small>${fagMerke(o.fag)}<span class="mono">${ddmm(o.fra)}–${ddmm(o.til)}</span>${hvem ? html`<span>${hvem}</span>` : ''}
-        ${visForutsetning && o.merknad ? html`<span>↳ ${o.merknad}</span>` : ''}${o.kommentarer ? html`<span>${icon('chat')} ${o.kommentarer}</span>` : ''}</small></div>
+        ${visForutsetning && o.merknad ? html`<span>↳ ${o.merknad}</span>` : ''}${o.uleste ? html`<span class="ulest-merke">${icon('chat')} ${o.uleste} ny</span>` : o.kommentarer ? html`<span>${icon('chat')} ${o.kommentarer}</span>` : ''}</small></div>
     <div class="hoyre">
       ${handlinger
         ? html`<button class="knapp liten" data-avvis="${o.id}">Send tilbake</button><button class="knapp liten ok" data-godkjenn="${o.id}">${icon('check')} Godkjenn</button>`
@@ -230,6 +240,7 @@ function plan(el, ctx) {
         <button data-modus="gantt" class="${planValg.modus === 'gantt' ? 'aktiv' : ''}">${icon('gantt')} Gantt</button>
         <button data-modus="liste" class="${planValg.modus === 'liste' ? 'aktiv' : ''}">${icon('list')} Liste</button>
       </div>
+      <button class="knapp" data-forskyv>${icon('shift')} Forskyv</button>
       <button class="knapp" data-import>${icon('upload')} Importer Excel</button>
     </div>
     <div id="plan"></div>`.toString();
@@ -254,6 +265,7 @@ function plan(el, ctx) {
     }),
   );
   $('[data-import]', el).addEventListener('click', () => importer(ctx));
+  $('[data-forskyv]', el).addEventListener('click', () => forskyv(ctx));
   tegn();
 }
 
@@ -316,7 +328,7 @@ function tegnPlan(el, ctx) {
           title="${o.godkjent ? 'Godkjent – klikk for å ta tilbake' : o.ferdig_meldt ? 'Meldt ferdig – klikk for å godkjenne' : 'Klikk for å godkjenne som ferdig'}"
           aria-label="Godkjenn ${o.tittel}">${icon('check')}</button>
         <span class="nr">${o.nr || ''}</span>
-        <span class="tittelcelle"><strong>${o.tittel}</strong><small>${[hvem, o.merknad].filter(Boolean).join(' · ') || ' '}</small></span>
+        <span class="tittelcelle"><strong>${o.uleste ? html`<span class="ulest-prikk" title="${o.uleste} ny melding"></span>` : ''}${o.tittel}</strong><small><span class="vis-mobil">${ddmm(o.fra)}–${ddmm(o.til)} · </span>${[hvem, o.merknad].filter(Boolean).join(' · ') || ' '}</small></span>
         <span class="datoer skjul-kompakt">${ddmm(o.fra)}–${ddmm(o.til)}</span>
         <span class="prio ${o.prioritet} skjul-kompakt">${PRIORITET_TEKST[o.prioritet]}</span>
         ${statusChip(o, dag)}
@@ -385,6 +397,65 @@ function tegnPlan(el, ctx) {
       }
     }),
   );
+}
+
+// Flytt mange oppgaver på én gang, regnet i arbeidsdager.
+async function forskyv(ctx) {
+  const { prosjekt: p, oppgaver, dag } = ctx;
+  const fagValg = [...new Set(oppgaver.map((o) => o.fag).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'nb'));
+  await modal({
+    tittel: 'Forskyv planen',
+    undertittel: 'Flytt alle åpne oppgaver fra en dato og utover. Godkjente oppgaver blir liggende.',
+    innhold: html`<form class="skjema" id="forskyv">
+      <div class="rad2">
+        <label class="felt"><span>Fag</span><select name="fag"><option value="">Alle fag</option>${fagValg.map((f) => html`<option>${f}</option>`)}</select></label>
+        <label class="felt"><span>Oppgaver som starter fra og med</span><input type="date" name="fra" value="${dag}" required></label>
+      </div>
+      <div class="felt"><span>Flytt</span>
+        <div class="stepper">
+          <button type="button" class="knapp" data-steg="-5">−5</button><button type="button" class="knapp" data-steg="-1">−1</button>
+          <input type="text" inputmode="numeric" name="dager" value="1" aria-label="Antall arbeidsdager">
+          <button type="button" class="knapp" data-steg="1">+1</button><button type="button" class="knapp" data-steg="5">+5</button>
+        </div>
+        <small>Arbeidsdager. Positivt tall flytter frem i tid, negativt tilbake. Helger hoppes over.</small></div>
+      <div class="kort forhandsvis" data-forhandsvis></div>
+      <div class="knapperad"><span class="spacer"></span><button type="button" class="knapp" data-lukk>Avbryt</button><button class="knapp primar">Forskyv</button></div>
+    </form>`,
+    onMount: (el, lukk) => {
+      const form = $('#forskyv', el);
+      const valgte = () => {
+        const d = formData(form);
+        return oppgaver.filter((o) => !o.godkjent && o.fra >= d.fra && (!d.fag || (o.fag || '').toLowerCase() === d.fag.toLowerCase()));
+      };
+      const vis = () => {
+        const n = Number(form.elements.dager.value);
+        const liste = valgte();
+        const gyldig = Number.isInteger(n) && n !== 0;
+        $('[data-forhandsvis]', el).innerHTML = html`<strong>${liste.length} ${liste.length === 1 ? 'oppgave' : 'oppgaver'} flyttes${gyldig ? ` ${Math.abs(n)} ${Math.abs(n) === 1 ? 'arbeidsdag' : 'arbeidsdager'} ${n > 0 ? 'frem' : 'tilbake'}` : ''}</strong>
+          ${liste.length ? html`<ul>${liste.slice(0, 6).map((o) => html`<li>${o.tittel} <span class="muted mono">${ddmm(o.fra)}–${ddmm(o.til)}${gyldig ? html` → ${ddmm(flyttArbeidsdager(o.fra, n))}–${ddmm(flyttArbeidsdager(o.til, n))}` : ''}</span></li>`)}
+            ${liste.length > 6 ? html`<li class="muted">+ ${liste.length - 6} flere</li>` : ''}</ul>` : ''}`.toString();
+      };
+      $$('[data-steg]', el).forEach((b) => b.addEventListener('click', () => {
+        let n = (Number(form.elements.dager.value) || 0) + Number(b.dataset.steg);
+        if (n === 0) n = Number(b.dataset.steg) > 0 ? 1 : -1;
+        form.elements.dager.value = n;
+        vis();
+      }));
+      form.addEventListener('input', vis);
+      vis();
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const d = formData(form);
+        if (!valgte().length) return toast('Ingen oppgaver å flytte', 'feil');
+        const r = await attempt(() => api.post(`/prosjekter/${p.id}/forskyv`, { fag: d.fag, fra: d.fra, dager: Number(d.dager) }));
+        if (r) {
+          toast(`${r.flyttet} oppgaver er flyttet`);
+          lukk(true);
+          ctx.onEndret();
+        }
+      });
+    },
+  });
 }
 
 async function importer(ctx) {
@@ -488,6 +559,14 @@ function sjekkFane(el, ctx) {
 
 // ---------- Kundeside ----------
 
+// Avkrysning for å varsle kunden på e-post. Uten e-postoppsett vises den, men er slått av,
+// så prosjektlederen ikke tror kunden har fått beskjed.
+export function epostValg(cls = '', hint = '') {
+  return store.epost
+    ? html`<label class="avkrysning ${cls}"><input type="checkbox" name="varsle_kunde" checked><span>Send e-post til kunden${hint ? html`<small>${hint}</small>` : ''}</span></label>`
+    : html`<label class="avkrysning ${cls} muted" title="Legg inn RESEND og MAIL_FROM i Vercel for å sende e-post"><input type="checkbox" disabled><span>Send e-post til kunden<small>E-post er ikke satt opp ennå</small></span></label>`;
+}
+
 function kundeFane(el, ctx) {
   const { prosjekt: p } = ctx;
   const lenke = `${location.origin}/k/${p.kunde_token}`;
@@ -500,8 +579,9 @@ function kundeFane(el, ctx) {
           <input type="text" name="tittel" placeholder="Overskrift, f.eks. «Flisene på badet er lagt»" required>
           <textarea name="tekst" placeholder="Fortell kort hva som har skjedd og hva som kommer."></textarea>
           <div class="bildestripe" data-bilder></div>
-          <div style="display:flex;gap:8px;align-items:center">
+          <div class="skriv-rad">
             <label class="knapp liten">${icon('camera')} Legg til bilder<input type="file" accept="image/*" multiple class="sr" name="bilder"></label>
+            ${p.kunde_epost ? epostValg('small') : ''}
             <span class="spacer"></span><button class="knapp primar liten">Publiser</button>
           </div>
         </form>
@@ -588,7 +668,7 @@ function kundeFane(el, ctx) {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const d = formData(form);
-    if (await attempt(() => api.post(`/prosjekter/${p.id}/oppdateringer`, { tittel: d.tittel, tekst: d.tekst, bilder: bilder.map((b) => b.id) }), 'Oppdateringen er publisert')) ctx.onEndret();
+    if (await attempt(() => api.post(`/prosjekter/${p.id}/oppdateringer`, { tittel: d.tittel, tekst: d.tekst, bilder: bilder.map((b) => b.id), varsle_kunde: d.varsle_kunde }), 'Oppdateringen er publisert')) ctx.onEndret();
   });
   $$('[data-slett-oppd]', el).forEach((b) => b.addEventListener('click', async () => {
     if ((await bekreft('Slette oppdateringen?', 'Den forsvinner fra kundesiden.', { ok: 'Slett', fare: true })) && (await attempt(() => api.del(`/oppdateringer/${b.dataset.slettOppd}`)))) ctx.onEndret();
@@ -603,6 +683,7 @@ function kundeFane(el, ctx) {
       <label class="felt"><span>Forklaring</span><textarea name="beskrivelse" placeholder="Det kunden trenger å vite for å velge."></textarea></label>
       <label class="felt"><span>Alternativer</span><input type="text" name="alternativer" placeholder="Grå, Sort, Hvit"><small>Skill med komma. La stå tomt for fritt svar.</small></label>
       <label class="felt"><span>Svarfrist</span><input type="date" name="frist"></label>
+      ${p.kunde_epost ? epostValg('', `${p.kunde_epost} får beskjed om at det ligger et spørsmål på prosjektsiden.`) : ''}
       <div class="knapperad"><span class="spacer"></span><button type="button" class="knapp" data-lukk>Avbryt</button><button class="knapp primar">Send til kunden</button></div>
     </form>`,
     onMount: (m, lukk) => $('#besl', m).addEventListener('submit', async (e) => {

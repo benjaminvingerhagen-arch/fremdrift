@@ -22,6 +22,29 @@ som mangler. Prosenten på forsiden og kundesiden teller bare godkjente oppgaver
 Kunden ser oppgaver som «Ferdig», «Pågår» eller «Kommer» – aldri «forsinket»,
 interne merknader eller hvem som er ansvarlig.
 
+## Varsler og e-post
+
+- **Varsler** (bjellen i menyen): det fagene og kunden har gjort som prosjektlederen bør følge opp –
+  meldt ferdig, meldinger på oppgaver, svar på spørsmål og leveranser kunden har flyttet.
+- **Uleste meldinger** vises med et oransje merke på oppgaven, både for prosjektleder og leverandør.
+- **E-post** (valgfritt): legg inn `RESEND` (API-nøkkel fra [Resend](https://resend.com)) og `MAIL_FROM`
+  (f.eks. `Fremdrift <varsel@dittfirma.no>`, domenet må være godkjent i Resend). Da får
+  - prosjektleder e-post når noe meldes ferdig, når fagene skriver og når kunden svarer eller flytter en leveranse,
+  - leverandøren e-post når oppgaven sendes tilbake eller prosjektlederen skriver,
+  - kunden e-post ved nye oppdateringer og spørsmål, når prosjektlederen krysser av for det.
+
+  Hver person kan slå av e-post under Folk og leverandører. Uten nøklene virker alt annet som før.
+  `APP_URL` kan settes hvis siden får eget domene; ellers brukes Vercel-adressen i lenkene.
+
+## Andre funksjoner
+
+- **Forskyv planen**: flytt alle åpne oppgaver fra en dato – for ett fag eller alle – et antall
+  arbeidsdager frem eller tilbake. Helger hoppes over, godkjente oppgaver blir liggende.
+- **Del bilde med kunden**: bilder leverandøren sender på en oppgave kan legges rett ut på kundesiden.
+- **App på hjemskjermen**: «Del → Legg til på Hjem-skjerm» (iPhone) eller «Installer app» (Android).
+  Leverandører får en egen startadresse, så appen åpner rett på oppgavelisten deres.
+  Den byttes ut når du lager ny lenke til personen.
+
 ## Excel-import
 
 «Nytt prosjekt» og «Importer Excel» i planen leser fremdriftsplanen i Excel:

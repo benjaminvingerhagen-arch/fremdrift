@@ -154,7 +154,10 @@ export async function loginMedLenke(req, res, nokkel) {
   );
   if (feil.n >= MAX_FAILS_PER_IP) return null;
   const s = String(nokkel || '');
-  const user = s.length >= 20 && s.length <= 100 ? await one('SELECT id FROM brukere WHERE lenke_hash = $1 AND aktiv', [sha256(s)]) : null;
+  const user =
+    s.length >= 20 && s.length <= 100
+      ? await one('SELECT id FROM brukere WHERE (lenke_hash = $1 OR app_nokkel = $2) AND aktiv', [sha256(s), s])
+      : null;
   if (!user) {
     await q(`INSERT INTO innloggingsforsok (epost, ip, vellykket) VALUES ('lenke', $1, false)`, [ip]);
     return null;
