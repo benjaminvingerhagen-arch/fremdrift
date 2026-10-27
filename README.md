@@ -4,6 +4,45 @@ Prosjektstyring for byggeprosjekter: fremdriftsplan med Gantt, oppgaver som ford
 til egne ansatte og leverandører, sjekkpunkter hver mandag og fredag, og en egen
 prosjektside kunden kan følge med på.
 
+## Forsiden og appen
+
+`/` er forsiden (`index.html`, `forside.css`, `forside.js`): funksjoner, sikkerhet, priser og
+«Be om demo». Selve systemet ligger på `/app` (`app.html`), og `/logg-inn` sender dit.
+Kundesiden er uendret på `/k/<nøkkel>`.
+
+Appen lå tidligere på `/`. Forsiden sender alle adresser som begynner med `#/` videre til
+`/app` med resten av adressen, så gamle bokmerker og lenker i e-post virker fortsatt. En app
+som er lagt på hjemskjermen fra den gamle adressen, åpner også rett i appen.
+
+Forsiden er foreløpig ikke søkbar (`noindex`) – det slås på når navn og domene er bestemt
+(se «Bytte navn»). Prisene står bare i `index.html`.
+
+## Henvendelser og «Meld feil»
+
+- **Be om demo** på forsiden lagres i tabellen `henvendelser`. Et skjult felt stopper roboter,
+  og hver avsender kan sende fem i timen (IP-adressen lagres bare som hash).
+- **Meld feil** ligger nederst i menyen for prosjektleder og nederst på siden til ansatte og
+  leverandører. Meldingen får med hvem, hvilken side og nettleser – ikke innholdet på siden.
+  20 meldinger per person i døgnet.
+- Begge vises under **Innstillinger → Henvendelser**, der de kan krysses av som behandlet.
+- På e-post sendes de bare når `RESEND` og `MAIL_FROM` er satt, og i tillegg
+  `KONTAKT_EPOST` (demo) og `FEILMELDING_EPOST` (feil, ellers `KONTAKT_EPOST`). Adressene står
+  bare i Vercel, ikke i koden, siden repoet er offentlig. Avsenderen blir svaradresse.
+
+## Bytte navn
+
+Navnet «Fremdrift» står her:
+
+- `shared/merke.js` – `NAVN` og `SLAGORD`, brukt i hele appen, i e-post, kalender og app-manifest
+- `index.html` (forsiden), `app.html` og `kunde.html` – tittel, beskrivelse og logotekst
+- `logo/favicon.svg` – `<title>` og `aria-label`
+
+Når navn og domene er bestemt: bytt på stedene over, sett `APP_URL` i Vercel, og gjør
+forsiden søkbar – `index, follow` og `<link rel="canonical">` i `index.html`, `X-Robots-Tag`
+bare på `/app`, `/api/*`, `/k/*` og `/kunde` i `vercel.json`, og legg til `robots.txt` og
+`sitemap.xml`. Personlige lenker og app-ikoner på hjemskjermen bør lages på nytt etter
+domenebytte.
+
 ## Hvem ser hva
 
 | Hvem | Kommer inn med | Ser og gjør |
@@ -70,7 +109,7 @@ innflytting og sluttfrist).
 2. **Storage → Create → Postgres** (Neon) og koble den til prosjektet. Det gir `DATABASE_URL`.
 3. **Storage → Create → Blob** og koble den til prosjektet (for bilder).
 4. **Settings → Environment Variables**: legg inn `REGISTRERINGSKODE` med en hemmelig kode.
-5. Deploy, åpne siden og registrer deg med koden. Du blir prosjektleder.
+5. Deploy, åpne `/app` og registrer deg med koden. Du blir prosjektleder.
    Registreringen stenges automatisk etter første prosjektleder.
 
 Tabellene opprettes av seg selv første gang.
@@ -88,7 +127,9 @@ npm test             # tilgangstester mot dev-serveren (start på tom database: 
 ## Oppbygging
 
 - `api/index.js` – én serverless-funksjon for hele API-et, med tilgangskontroll per rute
-- `api/_lib/routes/` – prosjekter, oppgaver, personer, kundesiden og bilder
+- `api/_lib/routes/` – prosjekter, oppgaver, personer, kundesiden, bilder, mangler, dagbok, kalender og henvendelser
 - `shared/plan.js` – regler for status, sjekkpunkter og fremdrift, brukt av både server og nettleser
-- `js/` – appen for prosjektleder (`app.js`, `views/`), leverandørsiden (`views/mine.js`) og kundesiden (`kunde.js`)
+- `index.html`, `forside.css`, `forside.js` – forsiden
+- `js/` – appen for prosjektleder (`app.js`, `views/`, på `/app`), leverandørsiden (`views/mine.js`) og kundesiden (`kunde.js`)
+- `shared/merke.js` – produktnavnet
 - `stil.css` – alt av utseende, med fargene som tokens øverst

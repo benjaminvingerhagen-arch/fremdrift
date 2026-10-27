@@ -3,13 +3,15 @@ import { html, icon, LOGO, $, $$, modal, attempt, toast, avatar, kopier, bekreft
 import { store } from '../store.js';
 import { skrivFelt, lastTraad } from './oppgave.js';
 import { mineManglerHtml, kobleMineMangler } from './mangler.js';
+import { meldFeil } from '../meldfeil.js';
 import { iDag, oppgaveStatus, STATUS, dagerMellom, datoMedDag, datoKort, ddmm, isoUke } from '/shared/plan.js';
+import { NAVN } from '/shared/merke.js';
 
 // Ansatte og leverandører: én side med egne oppgaver på tvers av prosjekter.
 // Laget for telefonen – store knapper og det viktigste øverst.
 
 export async function mineApp(root) {
-  document.title = 'Mine oppgaver · Fremdrift';
+  document.title = `Mine oppgaver · ${NAVN}`;
   const [data, mangler] = await Promise.all([api.get('/mine'), api.get('/mine/mangler').catch(() => [])]);
   const dag = iDag();
   const me = store.me;
@@ -59,7 +61,7 @@ export async function mineApp(root) {
 
   root.innerHTML = html`<div>
     <header class="mine-topp"><div class="indre">
-      <div class="merkevare" style="display:flex">${LOGO}<div><strong>Fremdrift</strong><small>${store.firma || ''}</small></div>
+      <div class="merkevare" style="display:flex">${LOGO}<div><strong>${NAVN}</strong><small>${store.firma || ''}</small></div>
         <span class="spacer"></span>${avatar(me.navn)}</div>
       <h1>Hei, ${me.navn.split(' ')[0]}</h1>
       <p>${datoMedDag(dag)} · uke ${isoUke(dag)}${me.fag ? ` · ${me.fag}` : ''}</p>
@@ -85,7 +87,7 @@ export async function mineApp(root) {
         <div><strong>Oppgavene i kalenderen din</strong><p class="small muted">Få oppgavene og viktige datoer rett i kalenderen på telefonen. Den oppdateres av seg selv når planen endres.</p></div>
         <button class="knapp" data-kalender>${icon('calendar')} Legg i kalenderen</button>
       </div>
-      <p class="muted xs" style="text-align:center;margin-top:14px">Denne siden er bare for deg. Ikke del lenken med andre.</p>
+      <p class="muted xs mine-bunn">Denne siden er bare for deg. Ikke del lenken med andre.<br><button type="button" class="lenkeknapp" data-meld-feil>${icon('melding')}<span>Noe som ikke virker? Meld feil</span></button></p>
     </main>
   </div>`.toString();
 
@@ -106,6 +108,7 @@ export async function mineApp(root) {
     }),
   );
   $('[data-kalender]', root)?.addEventListener('click', () => kalenderDialog());
+  $('[data-meld-feil]', root)?.addEventListener('click', () => meldFeil());
   kobleMineMangler(root, mangler, () => mineApp(root));
   $$('[data-traad]', root).forEach((b) =>
     b.addEventListener('click', async () => {
@@ -129,7 +132,7 @@ export async function mineApp(root) {
 function kalenderValg(adresse) {
   const webcal = adresse.replace(/^https?:/, 'webcal:');
   const google = `https://calendar.google.com/calendar/render?cid=${encodeURIComponent(webcal)}`;
-  const outlook = `https://outlook.live.com/calendar/0/addfromweb?url=${encodeURIComponent(adresse)}&name=${encodeURIComponent('Fremdrift')}`;
+  const outlook = `https://outlook.live.com/calendar/0/addfromweb?url=${encodeURIComponent(adresse)}&name=${encodeURIComponent(NAVN)}`;
   return html`<div class="skjema">
     <p class="small">Velg kalenderen du bruker. Oppgavene kommer inn som heldagshendelser og oppdateres av seg selv.</p>
     <div class="kalender-valg">

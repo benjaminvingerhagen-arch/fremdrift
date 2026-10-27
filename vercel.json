@@ -3,6 +3,9 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "regions": ["fra1"],
+  "redirects": [
+    { "source": "/logg-inn", "destination": "/app", "permanent": false }
+  ],
   "rewrites": [
     { "source": "/api/:rute*", "destination": "/api?rute=:rute*" },
     { "source": "/k/:token", "destination": "/kunde" }

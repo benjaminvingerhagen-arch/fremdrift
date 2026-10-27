@@ -20,6 +20,10 @@ npm test                        # i et annet vindu, mot dev-serveren på tom dat
   ikke med: der må `globalThis.__FREMDRIFT_DATO = '2026-11-04'` settes før appen lastes
   (f.eks. med Playwrights `addInitScript`), ellers regner siden status ut fra dagens dato.
 - Det er ingen byggesteg: nettleseren laster `js/` og `shared/` direkte som ES-moduler.
+- `/` er forsiden (`index.html`), appen ligger på `/app` (`app.html`). Lenker inn i appen fra
+  serveren (e-post, omdirigeringer, kalender) skal peke til `/app#/…`.
+- Produktnavnet skal byttes snart: bruk `NAVN` fra `shared/merke.js` i kode, aldri «Fremdrift»
+  som fast tekst. Se «Bytte navn» i README.md for HTML-filene.
 
 ## Slik er koden bygget
 

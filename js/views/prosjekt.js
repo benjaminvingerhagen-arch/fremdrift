@@ -6,6 +6,7 @@ import { fagHue, store } from '../store.js';
 import { oppfrisk } from '../app.js';
 import { lesFremdriftsplan } from '../regneark.js';
 import { aapneOppgave, statusChip, fagMerke, sendTilbake } from './oppgave.js';
+import { NAVN } from '/shared/merke.js';
 import {
   iDag, leggTilDager, dagerMellom, ukedag, erHelg, isoUke, arbeidsdager, arbeidsdagEtter,
   oppgaveStatus, fremdrift, sjekkpunkter, datoKort, datoMedDag, ddmm, DAGNAVN, PRIORITET_TEKST, MILEPAEL_TYPER, flyttArbeidsdager,
@@ -30,7 +31,7 @@ export async function prosjektView(el, id, fane = '', erAktuell = () => true) {
   const data = await api.get(`/prosjekter/${id}`);
   if (!erAktuell()) return;
   const { prosjekt: p, oppgaver } = data;
-  document.title = `${p.navn} · Fremdrift`;
+  document.title = `${p.navn} · ${NAVN}`;
   const dag = iDag();
   const fr = fremdrift(oppgaver);
   const venter = oppgaver.filter((o) => !o.godkjent && o.ferdig_meldt);

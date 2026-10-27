@@ -3,6 +3,7 @@ import { q, one } from '../db.js';
 import { f, fail, required } from '../http.js';
 import { epostSattOpp } from '../epost.js';
 import { checkPasswordStrength, createSession, destroySession, hashPassword, login, loginMedLenke, nyNokkel } from '../auth.js';
+import { NAVN } from '../../../shared/merke.js';
 
 export async function firmanavn() {
   const rad = await one(`SELECT verdi FROM innstillinger WHERE nokkel = 'firmanavn'`);
@@ -68,7 +69,7 @@ route(
   async ({ req, res, params }) => {
     const user = await loginMedLenke(req, res, params.nokkel);
     res.statusCode = 302;
-    res.setHeader('Location', user ? '/#/mine' : '/#/ugyldig-lenke');
+    res.setHeader('Location', user ? '/app#/mine' : '/app#/ugyldig-lenke');
     res.end();
   },
   { public: true },
@@ -91,7 +92,7 @@ route(
   'GET',
   '/manifest',
   async ({ res, user }) => {
-    let start = '/';
+    let start = '/app';
     if (user && user.rolle !== 'leder') {
       let rad = await one('SELECT app_nokkel FROM brukere WHERE id = $1', [user.id]);
       if (!rad.app_nokkel) rad = await one('UPDATE brukere SET app_nokkel = $1 WHERE id = $2 RETURNING app_nokkel', [nyNokkel(), user.id]);
@@ -103,8 +104,8 @@ route(
     res.setHeader('Cache-Control', 'private, no-store');
     res.end(
       JSON.stringify({
-        name: firma ? `Fremdrift · ${firma}` : 'Fremdrift',
-        short_name: 'Fremdrift',
+        name: firma ? `${NAVN} · ${firma}` : NAVN,
+        short_name: NAVN,
         start_url: start,
         scope: '/',
         display: 'standalone',

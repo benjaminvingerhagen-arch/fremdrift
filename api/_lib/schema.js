@@ -220,9 +220,30 @@ CREATE TABLE IF NOT EXISTS dagbok (
   endret TIMESTAMPTZ NOT NULL DEFAULT now(),
   PRIMARY KEY (prosjekt_id, dato)
 );
+
+-- Versjon 7: henvendelser – «Be om demo» fra forsiden og «Meld feil» fra appen.
+-- Lagres alltid, så ingenting går tapt om e-post ikke er satt opp. IP-adressen lagres
+-- bare som hash, og bare for å begrense hvor mange skjema én avsender kan sende.
+CREATE TABLE IF NOT EXISTS henvendelser (
+  id SERIAL PRIMARY KEY,
+  type TEXT NOT NULL,
+  navn TEXT,
+  firma TEXT,
+  epost TEXT,
+  telefon TEXT,
+  tekst TEXT,
+  side TEXT,
+  nettleser TEXT,
+  bruker_id INT REFERENCES brukere(id) ON DELETE SET NULL,
+  ip_hash TEXT,
+  sendt BOOLEAN NOT NULL DEFAULT false,
+  behandlet TIMESTAMPTZ,
+  opprettet TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS henvendelser_type_idx ON henvendelser (type, opprettet DESC);
 `;
 
-const VERSJON = 6;
+const VERSJON = 7;
 let klar = null;
 
 export function ensureSchema() {

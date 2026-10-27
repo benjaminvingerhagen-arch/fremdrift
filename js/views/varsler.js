@@ -2,6 +2,7 @@ import { api } from '../api.js';
 import { html, icon, $$, avatar } from '../ui.js';
 import { store } from '../store.js';
 import { tegnMeny } from '../app.js';
+import { NAVN } from '/shared/merke.js';
 
 // Det andre har gjort som prosjektlederen bør følge opp: meldt ferdig, meldinger fra
 // fagene, svar fra kunden og leveranser kunden har flyttet.
@@ -24,7 +25,7 @@ function dagOverskrift(ts) {
 }
 
 export async function varslerView(el) {
-  document.title = 'Varsler · Fremdrift';
+  document.title = `Varsler · ${NAVN}`;
   const liste = await api.get('/varsler');
   const uleste = liste.filter((v) => v.ulest).length;
   const grupper = [];
@@ -37,7 +38,7 @@ export async function varslerView(el) {
 
   el.innerHTML = html`
     <div class="topp">
-      <div class="tittel"><div class="over">${store.firma || 'Fremdrift'}</div><h1>Varsler</h1>
+      <div class="tittel"><div class="over">${store.firma || NAVN}</div><h1>Varsler</h1>
         <div class="under"><span>${uleste ? `${uleste} nye siden sist` : 'Ingen nye siden sist'} · siste 30 dager</span></div></div>
     </div>
     ${liste.length

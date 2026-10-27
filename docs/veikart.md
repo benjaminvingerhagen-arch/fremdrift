@@ -34,6 +34,12 @@ Bygglet m.fl.), tilpasset små byggefirma og håndverkere.
 - **SMS-varsler** i tillegg til e-post. Krever en SMS-tjeneste med egen nøkkel og kostnad.
 - **Slå på e-post**: koden er klar, men `RESEND` og `MAIL_FROM` er ikke satt i Vercel. Krever
   Resend-konto og et godkjent avsenderdomene.
+- **Nytt navn og domene**: navnet står i `shared/merke.js` og noen HTML-filer (se «Bytte navn» i
+  README). Når det er bestemt: gjør forsiden søkbar (canonical, robots.txt, sitemap).
+- **Priser**: forsiden har forslag (490 kr for én prosjektleder, 390 kr per prosjektleder for
+  2–5, ellers etter avtale). Benjamin bestemmer tallene.
+- **E-post for henvendelser**: «Be om demo» og «Meld feil» lagres og vises under Innstillinger,
+  men sendes på e-post først når `KONTAKT_EPOST` / `FEILMELDING_EPOST` og Resend er satt.
 - **Eget domene**: siden kjører på Vercel-adressen. Med eget domene må `APP_URL` settes, og
   personlige lenker og app-ikoner på hjemskjermen bør lages på nytt.
 
@@ -65,3 +71,7 @@ Bygglet m.fl.), tilpasset små byggefirma og håndverkere.
 - 2026-10: Dagbok på prosjektet: én side per dag med vær, temperatur, bemanning per fag
   (forslag fra oppgavene som pågår), hva som ble gjort, interne avvik og bilder. En dag kan
   deles med kunden som oppdatering, uten avvik og bemanning.
+- 2026-10: Forside på `/` med funksjoner, sikkerhet, priser og «Be om demo»; appen flyttet til
+  `/app` (gamle `#/`-lenker sendes videre). Bunnen av menyen samler Min profil, Meld feil,
+  Innstillinger og Logg ut, og ny side Innstillinger (profil, firma, henvendelser).
+  Produktnavnet samlet i `shared/merke.js`.

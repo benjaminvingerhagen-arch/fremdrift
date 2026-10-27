@@ -12,6 +12,7 @@ import './_lib/routes/vedlegg.js';
 import './_lib/routes/kalender.js';
 import './_lib/routes/mangler.js';
 import './_lib/routes/dagbok.js';
+import './_lib/routes/henvendelser.js';
 import './_lib/routes/varsler.js';
 
 function routePath(req) {
