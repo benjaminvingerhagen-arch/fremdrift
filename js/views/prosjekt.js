@@ -3,6 +3,7 @@ import { html, raw, icon, $, $$, bar, progressRing, modal, attempt, formData, be
 import { manglerFane } from './mangler.js';
 import { dagbokFane } from './dagbok.js';
 import { okonomiFane } from './okonomi.js';
+import { dokumenterFane } from './dokumenter.js';
 import { fagHue, store } from '../store.js';
 import { oppfrisk } from '../app.js';
 import { lesFremdriftsplan } from '../regneark.js';
@@ -19,6 +20,7 @@ const FANER = [
   ['sjekkpunkter', 'Sjekkpunkter', 'checkCircle'],
   ['mangler', 'Mangler', 'alert'],
   ['dagbok', 'Dagbok', 'file'],
+  ['dokumenter', 'Dokumenter', 'folder'],
   ['okonomi', 'Økonomi', 'chart'],
   ['kunde', 'Kundeside', 'eye'],
   ['logg', 'Logg', 'clock'],
@@ -56,7 +58,7 @@ export async function prosjektView(el, id, fane = '', erAktuell = () => true) {
       <button class="knapp primar" data-ny-oppgave>${icon('plus')} Ny oppgave</button>
     </div>
     <nav class="faner">${FANER.map(
-      ([k, navn, ik]) => html`<a href="#/p/${p.id}${k ? `/${k}` : ''}" class="${(fane || '') === k ? 'aktiv' : ''}">${icon(ik)} ${navn}
+      ([k, navn, ik]) => html`<a href="#/p/${p.id}${k ? `/${k}` : ''}" class="${(fane || '').split('/')[0] === k ? 'aktiv' : ''}">${icon(ik)} ${navn}
         ${k === '' && venter.length ? html`<span class="teller lilla">${venter.length}</span>` : ''}
         ${k === 'kunde' && nyeSvar ? html`<span class="teller">${nyeSvar}</span>` : ''}
         ${k === 'mangler' && manglerTilKontroll ? html`<span class="teller lilla">${manglerTilKontroll}</span>` : ''}</a>`,
@@ -80,6 +82,7 @@ export async function prosjektView(el, id, fane = '', erAktuell = () => true) {
   if (fane === 'mangler') return manglerFane(f, ctx);
   if (fane === 'dagbok') return dagbokFane(f, ctx);
   if (fane === 'okonomi') return okonomiFane(f, ctx);
+  if (fane === 'dokumenter' || fane === 'dokumenter/uke') return dokumenterFane(f, ctx, fane.split('/')[1] || '');
   if (fane === 'kunde') return kundeFane(f, ctx);
   if (fane === 'logg') return loggFane(f, ctx);
   if (fane === 'innstillinger') return innstillinger(f, ctx);
@@ -170,6 +173,7 @@ function oversikt(el, ctx, fr, venter) {
     </div>
     ${spIDag ? html`<div class="banner signal">${icon('checkCircle')} Sjekkpunkt i dag – ${nesteSp.fokus.toLowerCase()}<a class="knapp liten" href="#/p/${p.id}/sjekkpunkter">Åpne sjekkpunktet</a></div>` : ''}
     ${milepaelIDag ? html`<div class="banner fare">${icon('flag')} Milepæl i dag: ${milepaelIDag.navn}</div>` : ''}
+    ${ukedag(dag) === 4 && oppgaver.length ? html`<div class="banner">${icon('list')} Fredag: ukesoppsummeringen for uke ${isoUke(dag)} er klar, med forslag til oppdatering til kunden.<a class="knapp liten" href="#/p/${p.id}/dokumenter/uke">Se uken</a></div>` : ''}
     ${!oppgaver.length
       ? html`<div class="kort" style="padding:36px;text-align:center;display:grid;gap:14px;justify-items:center">
           <span class="avatar stor" style="--hue:210">${icon('gantt')}</span>
@@ -197,6 +201,8 @@ function oversikt(el, ctx, fr, venter) {
             <a class="knapp liten" href="#/p/${p.id}/sjekkpunkter" style="justify-self:start">Gå til sjekkpunktene</a>
           </div></div>` : ''}
         <div class="kort"><div class="kort-topp"><h2>${icon('users')} Fremdrift per fag</h2></div>${fagListe(oppgaver, dag)}</div>
+        <a class="kort uke-lenke" href="#/p/${p.id}/dokumenter/uke"><span class="kalender-ikon">${icon('list')}</span>
+          <span><strong>Ukesoppsummering</strong><small class="muted">Uke ${isoUke(dag)}: godkjent, mangler, dagbok og bilder – og et utkast til kunden</small></span>${icon('chevronRight')}</a>
       </div>
     </div>`}`.toString();
   koblOppgaver(el, ctx);

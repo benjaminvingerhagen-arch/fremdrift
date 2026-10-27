@@ -4,6 +4,7 @@ import { store } from '../store.js';
 import { skrivFelt, lastTraad } from './oppgave.js';
 import { mineManglerHtml, kobleMineMangler } from './mangler.js';
 import { meldFeil } from '../meldfeil.js';
+import { mineDokumenterHtml, kobleMineDokumenter } from './dokumenter.js';
 import { iDag, oppgaveStatus, STATUS, dagerMellom, datoMedDag, datoKort, ddmm, isoUke } from '/shared/plan.js';
 import { NAVN } from '/shared/merke.js';
 
@@ -12,7 +13,11 @@ import { NAVN } from '/shared/merke.js';
 
 export async function mineApp(root) {
   document.title = `Mine oppgaver · ${NAVN}`;
-  const [data, mangler] = await Promise.all([api.get('/mine'), api.get('/mine/mangler').catch(() => [])]);
+  const [data, mangler, dokumenter] = await Promise.all([
+    api.get('/mine'),
+    api.get('/mine/mangler').catch(() => []),
+    api.get('/mine/dokumenter').catch(() => null),
+  ]);
   const dag = iDag();
   const me = store.me;
   const grupper = { handling: [], pagar: [], snart: [], senere: [], meldt: [], ferdig: [] };
@@ -87,6 +92,7 @@ export async function mineApp(root) {
           <span class="kalender-ikon">${icon('gantt')}</span>
           <span><strong>${p.navn}</strong><small>Alle fag i planen${p.innflytting ? ` · innflytting ${datoKort(p.innflytting)}` : ''}</small></span>
           ${icon('chevronRight')}</a>`)}</div>` : ''}
+      ${mineDokumenterHtml(dokumenter)}
       <div class="kort kalender-kort">
         <span class="kalender-ikon">${icon('calendar')}</span>
         <div><strong>Oppgavene i kalenderen din</strong><p class="small muted">Få oppgavene og viktige datoer rett i kalenderen på telefonen. Den oppdateres av seg selv når planen endres.</p></div>
@@ -115,6 +121,7 @@ export async function mineApp(root) {
   $('[data-kalender]', root)?.addEventListener('click', () => kalenderDialog());
   $('[data-meld-feil]', root)?.addEventListener('click', () => meldFeil());
   kobleMineMangler(root, mangler, () => mineApp(root));
+  kobleMineDokumenter(root, dokumenter, () => mineApp(root));
   $$('[data-traad]', root).forEach((b) =>
     b.addEventListener('click', async () => {
       const o = finn(b.dataset.traad);

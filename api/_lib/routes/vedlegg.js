@@ -1,7 +1,7 @@
 import { route } from '../router.js';
 import { one } from '../db.js';
 import { f, fail } from '../http.js';
-import { MAKS_BYTE, TILLATTE_TYPER, erRiktigType, hentFil, lagreFil } from '../lagring.js';
+import { LASTES_NED, MAKS_BYTE, TILLATTE_TYPER, erRiktigType, hentFil, lagreFil } from '../lagring.js';
 
 // Bilder sendes som rå kropp med metadata i headere – da slipper vi base64, som
 // ville gjort filen en tredjedel større og spist av grensen på 4,5 MB hos Vercel.
@@ -30,7 +30,8 @@ function filnavnFra(req) {
 export function sendFil(res, data, type, navn) {
   res.statusCode = 200;
   res.setHeader('Content-Type', type);
-  res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(navn || 'fil')}"`);
+  const fil = encodeURIComponent(navn || 'fil');
+  res.setHeader('Content-Disposition', `${LASTES_NED.has(type) ? 'attachment' : 'inline'}; filename="${fil}"; filename*=UTF-8''${fil}`);
   res.setHeader('Cache-Control', 'private, max-age=86400');
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.end(data);
@@ -54,7 +55,7 @@ route(
       if (!har) fail(403, 'Du har ingen oppgaver i dette prosjektet.');
     }
     const type = String(req.headers['content-type'] || '').split(';')[0].trim();
-    if (!TILLATTE_TYPER[type]) fail(400, 'Bare bilder (JPG, PNG, WEBP) og PDF kan lastes opp.');
+    if (!TILLATTE_TYPER[type]) fail(400, 'Bare bilder (JPG, PNG, WEBP), PDF, Word og Excel kan lastes opp.');
     const data = await kroppen(req);
     if (!data.length) fail(400, 'Filen er tom.');
     if (data.length > MAKS_BYTE) fail(413, 'Filen er for stor. Grensen er 4 MB.');
@@ -77,7 +78,7 @@ route(
     if (!v) fail(404, 'Fant ikke filen.');
     if (user.rolle !== 'leder' && v.opplastet_av !== user.id) {
       // Andre ser et bilde når det henger ved en kommentar på en av deres egne oppgaver,
-      // eller er bildet av en mangel de skal utbedre.
+      // eller er bildet av en mangel de skal utbedre, eller et dokument som er delt med fagene.
       const ok = await one(
         `SELECT 1 FROM kommentarer k JOIN oppgaver o ON o.id = k.oppgave_id
           WHERE k.vedlegg_id = $1
@@ -85,7 +86,12 @@ route(
          UNION ALL
          SELECT 1 FROM mangler m
           WHERE (m.bilde_id = $1 OR m.utbedret_bilde_id = $1)
-            AND (m.ansvarlig_id = $2 OR (m.ansvarlig_id IS NULL AND $3::text IS NOT NULL AND lower(m.fag) = lower($3::text))) LIMIT 1`,
+            AND (m.ansvarlig_id = $2 OR (m.ansvarlig_id IS NULL AND $3::text IS NOT NULL AND lower(m.fag) = lower($3::text)))
+         UNION ALL
+         SELECT 1 FROM dokumenter d
+          WHERE d.vedlegg_id = $1 AND d.synlig_for_fag
+            AND EXISTS (SELECT 1 FROM oppgaver o WHERE o.prosjekt_id = d.prosjekt_id
+                          AND (o.ansvarlig_id = $2 OR (o.ansvarlig_id IS NULL AND $3::text IS NOT NULL AND lower(o.fag) = lower($3::text)))) LIMIT 1`,
         [v.id, user.id, user.fag],
       );
       if (!ok) fail(403, 'Ingen tilgang til filen.');

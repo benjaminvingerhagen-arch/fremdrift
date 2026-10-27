@@ -118,6 +118,15 @@ interne merknader eller hvem som er ansvarlig.
 - **Dagbok** (fanen i prosjektet): én side per dag med vær, bemanning per fag, hva som ble gjort,
   avvik og bilder. Dagboken er intern; «Del med kunden» gjør en dag om til en oppdatering på
   kundesiden, uten avvik og bemanning.
+- **Dokumenter** (fanen i prosjektet): tegninger, kontrakter, FDV, samsvarserklæringer, SHA/HMS
+  og bilder samlet på ett sted (PDF, Word, Excel og bilder, inntil 4 MB per fil). Prosjektlederen
+  velger per dokument om kunden og/eller fagene skal se det. Fagene kan levere dokumenter selv fra
+  «mine»-siden; de er bare synlige for prosjektlederen til hen deler dem. Bildene fra meldinger,
+  mangler, dagbok og oppdateringer vises også, og kan legges i dokumentene.
+- **Ukesoppsummering** (under Dokumenter): alt som skjedde i prosjektet én uke – godkjent, meldt
+  ferdig, passert frist, neste uke, mangler, dagbok med dagsverk, kundens valg, sjekkpunkter,
+  dokumenter og bilder. Kan skrives ut, og lager et utkast til ukesoppdatering for kunden (bare
+  oppgaver kunden ser) som prosjektlederen retter før publisering. På fredager minner oversikten om den.
 - **Kalenderabonnement**: ansatte og leverandører trykker «Legg i kalenderen» på siden med
   oppgavene sine og får en personlig kalenderadresse (.ics) for iPhone, Google Kalender eller
   Outlook. Egne oppgaver og viktige datoer (fast dato, innflytting, sluttfrist) kommer inn som
@@ -158,7 +167,7 @@ npm test             # tilgangstester mot dev-serveren (start på tom database: 
 ## Oppbygging
 
 - `api/index.js` – én serverless-funksjon for hele API-et, med tilgangskontroll per rute
-- `api/_lib/routes/` – prosjekter, oppgaver, personer, kundesiden, bilder, mangler, dagbok, kalender og henvendelser
+- `api/_lib/routes/` – prosjekter, oppgaver, personer, kundesiden, bilder, mangler, dagbok, dokumenter og ukesoppsummering, kalender og henvendelser
 - `shared/plan.js` – regler for status, sjekkpunkter og fremdrift, brukt av både server og nettleser
 - `index.html`, `forside.css`, `forside.js` – forsiden
 - `js/` – appen for prosjektleder (`app.js`, `views/`, på `/app`), leverandørsiden (`views/mine.js`) og kundesiden (`kunde.js`)

@@ -9,25 +9,29 @@ Bygglet m.fl.), tilpasset små byggefirma og håndverkere.
 
 ## Neste
 
-1. **Utkast til ukesoppdatering for kunden** – fredag lages et forslag til oppdatering ut
-   fra ukens godkjente oppgaver og bilder, som prosjektlederen retter og publiserer.
-2. **Avhengigheter mellom oppgaver** – «starter når X er ferdig», og tilbud om å flytte
+1. **Avhengigheter mellom oppgaver** – «starter når X er ferdig», og tilbud om å flytte
    bare de etterfølgende oppgavene når én oppgave flyttes (i dag kan planen forskyves for
    ett fag eller alle fag fra en valgt dato).
-3. **Tilleggsarbeid som kunden godkjenner** – beskrivelse og pris, kunden godkjenner på
+2. **Tilleggsarbeid som kunden godkjenner** – beskrivelse og pris, kunden godkjenner på
    kundesiden. Bygger på beslutningene som finnes i dag.
-4. **Utskrift/PDF av fremdriftsplanen** – det finnes en enkel `@media print` i `stil.css`
+3. **Utskrift/PDF av fremdriftsplanen** – det finnes en enkel `@media print` i `stil.css`
    (skjuler meny og knapper), men Gantt-planen deles ikke pent over sider og kundesiden har
    ingen egen utskriftsstil. Liggende A3/A4 med fag og uker på hver side.
-5. **Leverandørsiden uten nett** – vis sist hentede oppgaver når dekningen er dårlig
+4. **Leverandørsiden uten nett** – vis sist hentede oppgaver når dekningen er dårlig
    på byggeplassen, og send ferdigmeldinger når nettet er tilbake.
-6. **Kalender for prosjektlederen** – samme abonnement med milepæler, sjekkpunkter
+5. **Kalender for prosjektlederen** – samme abonnement med milepæler, sjekkpunkter
    (mandag/fredag) og frister i alle prosjekter, og vis på kalenderkortet om kalenderen er på.
-7. **Mangelliste ved overtakelse, del 2** – utskrift/PDF av mangellisten til
+6. **Mangelliste ved overtakelse, del 2** – utskrift/PDF av mangellisten til
    overtakelsesprotokollen, og at kunden kan melde inn mangler selv fra kundesiden
    (som prosjektlederen godkjenner før de går til faget).
-8. **Dagbok, del 2** – hent været automatisk fra MET (api.met.no, gratis, ingen nøkkel) ut
+7. **Dagbok, del 2** – hent været automatisk fra MET (api.met.no, gratis, ingen nøkkel) ut
    fra prosjektadressen, og utskrift/PDF av dagboken for en periode (dokumentasjon ved tvist).
+8. **Dokumenter, del 2** – større filer enn 4 MB (tegninger) ved å laste opp rett til Vercel Blob
+   fra nettleseren (klientopplasting med token), mapper/revisjoner («erstatt med ny versjon» som
+   beholder historikken), og en samlet nedlasting (zip) av FDV-dokumentasjonen ved overtakelse.
+9. **Ukesoppsummering på e-post** – fredag ettermiddag sendes oppsummeringen til prosjektlederen
+   (Vercel Cron med `CRON_SECRET`, og Resend). Krever at e-post er slått på. Ta gjerne med ukens
+   kostnader fra Tripletex når nøkkelen er på plass.
 
 ## Krever avklaring med Benjamin
 
@@ -83,3 +87,5 @@ Bygglet m.fl.), tilpasset små byggefirma og håndverkere.
 - 2026-10: Økonomi fra Tripletex: bokførte kostnader, fakturaer til godkjenning og førte timer per
   prosjekt, med budsjett mot fremdrift. Bare lesing. Lokal etterligning av Tripletex for utvikling og tester.
 - 2026-10: Eksempelprosjekt med ett trykk, med oppdiktede data og eksempeltall for økonomi, til demonstrasjon.
+- 2026-10: Dokumenthotell per prosjekt (kategorier, deling med kunde og fag, fagene leverer selv, Word og
+  Excel i tillegg til PDF og bilder) og ukesoppsummering med utkast til ukesoppdatering for kunden.

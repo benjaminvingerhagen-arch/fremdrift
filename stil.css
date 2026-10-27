@@ -769,6 +769,73 @@ body.har-modal { overflow: hidden; }
   .plan-rull { max-height: none; overflow: visible; }
 }
 
+/* ---------- Dokumenter og ukesoppsummering ---------- */
+.dok-hode { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
+.dok-intro { max-width: 70ch; margin: 0 0 16px; }
+.dokliste { list-style: none; margin: 0 0 22px; padding: 0; }
+.dok { display: grid; grid-template-columns: auto 1fr auto; gap: 14px; align-items: center; padding: 12px 18px; border-top: 1px solid var(--line-soft); }
+.dok:first-child { border-top: 0; }
+.dok-forhand { display: grid; place-items: center; width: 52px; height: 52px; border-radius: var(--r-sm); overflow: hidden; background: var(--surface-3); text-decoration: none !important; }
+.dok-forhand img, .samlet-bilde img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.dok-tekst { display: grid; gap: 4px; min-width: 0; }
+.dok-tittel { font-weight: 650; color: var(--fg); overflow-wrap: anywhere; }
+.dok .meta { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }
+.dok .meta .ikon { width: 13px; height: 13px; }
+.dok-type { font-size: 11px; font-weight: 750; letter-spacing: .03em; padding: 4px 6px; border-radius: 5px; background: var(--noytral-bg); color: var(--noytral-fg); }
+.dok-type.pdf { background: var(--fare-bg); color: var(--fare-fg); }
+.dok-type.word { background: var(--aktiv-bg); color: var(--aktiv-fg); }
+.dok-type.excel { background: var(--ok-bg); color: var(--ok-fg); }
+.dok-stor { display: flex; gap: 12px; align-items: center; padding: 10px; border-radius: var(--r-sm); background: var(--surface-2); border: 1px solid var(--line-soft); }
+.dok-stor img, .dok-stor .dok-type { width: 64px; height: 64px; object-fit: cover; border-radius: 6px; display: grid; place-items: center; }
+.dok-stor span:last-child { display: inline-flex; gap: 6px; align-items: center; font-weight: 600; }
+.samlet-tittel { margin-top: 26px; }
+.samlet { list-style: none; padding: 0; margin: 10px 0 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; }
+.samlet li { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; padding: 8px; background: var(--surface); border: 1px solid var(--line-soft); border-radius: var(--r-md); min-width: 0; }
+.samlet-bilde { display: grid; place-items: center; width: 48px; height: 48px; border-radius: var(--r-sm); overflow: hidden; background: var(--surface-3); text-decoration: none !important; }
+.samlet-tekst { display: grid; min-width: 0; }
+.samlet-tekst strong { font-size: 12.5px; }
+.samlet-tekst small { color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.uke-nav { display: flex; gap: 12px; align-items: center; margin: 6px 0 18px; }
+.uke-nav h2 { display: flex; gap: 8px; align-items: center; font-size: 22px; }
+.uke-rutenett { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-bottom: 16px; }
+.uke-del { padding: 16px 18px; display: grid; gap: 10px; align-content: start; margin-bottom: 16px; }
+.uke-rutenett .uke-del { margin-bottom: 0; }
+.uke-del h3 { display: flex; gap: 8px; align-items: center; font-size: 14.5px; margin: 0; }
+.uke-del h3 .ikon { width: 17px; height: 17px; color: var(--muted); }
+.uke-liste { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.uke-liste li { display: flex; gap: 10px; align-items: flex-start; }
+.uke-liste .nr { font-family: var(--mono, monospace); font-size: 12px; color: var(--muted); min-width: 30px; padding-top: 2px; }
+.uke-tekst { display: grid; gap: 2px; flex: 1; min-width: 0; }
+.uke-tekst small { color: var(--muted); }
+.uke-tekst .ikon { width: 14px; height: 14px; vertical-align: -2px; }
+.uke-dato { min-width: 120px; font-weight: 600; font-size: 13px; display: inline-block; }
+.uke-dato::first-letter { text-transform: uppercase; }
+.dok-lever { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; border-top: 1px solid var(--line-soft); }
+.uke-fag { margin: -6px 4px 16px; }
+.uke-bilder { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
+.uke-bilder a { aspect-ratio: 1; border-radius: var(--r-sm); overflow: hidden; background: var(--surface-3); }
+.uke-bilder img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.uke-lenke { display: grid; grid-template-columns: auto 1fr auto; gap: 14px; align-items: center; padding: 14px 18px; color: inherit; text-decoration: none !important; }
+.uke-lenke:hover { background: var(--surface-2); }
+.uke-lenke small { display: block; font-size: 12.5px; }
+.uke-lenke .kalender-ikon { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 10px; background: var(--surface-3); color: var(--fg-2); }
+.uke-lenke > .ikon { color: var(--muted); }
+@media (max-width: 640px) {
+  .dok { grid-template-columns: auto 1fr; padding: 12px 14px; }
+  .dok > .knapp { grid-column: 2; justify-self: start; }
+  .dok-hode .segment { width: 100%; }
+  .dok-hode .segment button { flex: 1; justify-content: center; }
+  .dok-hode > .knapp { flex: 1; justify-content: center; }
+  .dok-hode .spacer { display: none; }
+  .uke-liste li.uke-dag { flex-direction: column; gap: 2px; }
+  .uke-rutenett { grid-template-columns: 1fr; }
+}
+@media print {
+  .dok-hode, .uke-nav .ikon-knapp, .uke-lenke { display: none !important; }
+  .uke-del, .tall { break-inside: avoid; box-shadow: none; }
+  .uke-bilder { grid-template-columns: repeat(6, 1fr); }
+}
+
 /* =====================================================================
    Kundesiden
    ===================================================================== */

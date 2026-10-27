@@ -35,7 +35,7 @@ route(
     const dag = iDag();
     const mandag = leggTilDager(dag, -ukedag(dag));
     const sondag = leggTilDager(mandag, 6);
-    const [oppgaver, milepaeler, oppdateringer, beslutninger, mangler] = await Promise.all([
+    const [oppgaver, milepaeler, oppdateringer, beslutninger, mangler, dokumenter] = await Promise.all([
       q(
         `SELECT id, fag, tittel, fra, til, ferdig_meldt, godkjent, kunde_styrt, beskrivelse
            FROM oppgaver WHERE prosjekt_id = $1 AND (synlig_for_kunde OR kunde_styrt) ORDER BY fra, sortering, id`,
@@ -52,6 +52,13 @@ route(
       q(
         `SELECT id, tittel, rom, (godkjent IS NOT NULL) AS utbedret, godkjent::date AS utbedret_dato
            FROM mangler WHERE prosjekt_id = $1 AND synlig_for_kunde ORDER BY godkjent IS NOT NULL, opprettet, id`,
+        [p.id],
+      ),
+      // Dokumentene prosjektlederen har delt – uten hvem som la dem inn.
+      q(
+        `SELECT d.vedlegg_id AS id, d.tittel, d.kategori, d.beskrivelse, d.opprettet::date AS dato, v.type, v.navn AS filnavn
+           FROM dokumenter d JOIN vedlegg v ON v.id = d.vedlegg_id
+          WHERE d.prosjekt_id = $1 AND d.synlig_for_kunde ORDER BY d.kategori, d.opprettet DESC`,
         [p.id],
       ),
     ]);
@@ -109,6 +116,7 @@ route(
       oppdateringer,
       beslutninger,
       mangler,
+      dokumenter,
     };
   },
   { public: true },
@@ -189,11 +197,16 @@ route(
     const p = await prosjektFor(params.token);
     const id = f.id(params.id);
     const v = await one('SELECT * FROM vedlegg WHERE id = $1 AND prosjekt_id = $2', [id, p.id]);
-    // Kunden får bare filer som er publisert til kunden: forsidebildet og bildene i oppdateringene.
+    // Kunden får bare filer som er publisert til kunden: forsidebildet, bildene i oppdateringene
+    // og dokumentene som er delt med kunden.
     const publisert =
       v &&
       (p.forsidebilde_id === id ||
-        (await one(`SELECT 1 FROM oppdateringer WHERE prosjekt_id = $1 AND bilder @> $2::jsonb LIMIT 1`, [p.id, JSON.stringify([id])])));
+        (await one(
+          `SELECT 1 FROM oppdateringer WHERE prosjekt_id = $1 AND bilder @> $2::jsonb
+           UNION ALL SELECT 1 FROM dokumenter WHERE prosjekt_id = $1 AND vedlegg_id = $3 AND synlig_for_kunde LIMIT 1`,
+          [p.id, JSON.stringify([id]), id],
+        )));
     if (!publisert) fail(404, 'Fant ikke filen.');
     sendFil(res, await hentFil(v.nokkel), v.type, v.navn);
   },

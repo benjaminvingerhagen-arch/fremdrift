@@ -1,6 +1,6 @@
 import { html, icon, LOGO, $, $$, progressRing, bar, modal, toast, attempt, formData, kobleDatoer } from './ui.js';
 import { fagHue } from './store.js';
-import { dagerMellom, leggTilDager, datoKort, datoMedDag, ddmm, isoUke, ukedag } from '/shared/plan.js';
+import { dagerMellom, leggTilDager, datoKort, datoMedDag, ddmm, isoUke, ukedag, DOKUMENT_KATEGORIER } from '/shared/plan.js';
 
 // Kundesiden. Nøkkelen i adressen (/k/<nøkkel>) er hele tilgangen.
 const token = location.pathname.split('/')[2] || '';
@@ -142,6 +142,14 @@ function tegn(d) {
               ${m.utbedret ? html`<span class="k-hake">${icon('check')}</span>` : html`<span class="k-apen" aria-hidden="true"></span>`}
               <div><strong>${m.tittel}</strong><small>${[m.rom, m.utbedret && m.utbedret_dato ? `utbedret ${ddmm(m.utbedret_dato)}` : null].filter(Boolean).join(' · ')}</small></div>
               <span class="chip ${m.utbedret ? 'ok' : 'varsel'}">${m.utbedret ? 'Utbedret' : 'Åpen'}</span></li>`)}</ul>
+          </section>` : ''}
+
+          ${d.dokumenter?.length ? html`<section class="k-kort">
+            <h2 class="k-tittel">${icon('folder')} Dokumenter <span class="k-merke">${d.dokumenter.length}</span></h2>
+            <p class="k-tekst" style="margin-bottom:12px">Tegninger, avtaler og dokumentasjon for boligen din. Trykk for å åpne eller laste ned.</p>
+            <ul class="k-liste">${d.dokumenter.map((x) => html`<li>
+              <span class="dok-type ${x.type === 'application/pdf' ? 'pdf' : x.type.includes('word') ? 'word' : x.type.includes('sheet') ? 'excel' : ''}">${x.type === 'application/pdf' ? 'PDF' : x.type.includes('word') ? 'Word' : x.type.includes('sheet') ? 'Excel' : 'Bilde'}</span>
+              <div><a href="${fil(x.id)}" target="_blank" rel="noopener"><strong>${x.tittel}</strong></a><small>${[DOKUMENT_KATEGORIER[x.kategori], x.beskrivelse].filter(Boolean).join(' · ')}</small></div></li>`)}</ul>
           </section>` : ''}
 
           ${besvart.length ? html`<section class="k-kort">

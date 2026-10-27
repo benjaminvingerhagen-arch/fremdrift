@@ -3,7 +3,7 @@ import { q, one } from '../db.js';
 
 // Varsler for prosjektlederen: det andre har gjort som krever oppfølging.
 // Hentes fra loggen (hendelser med type), og «ulest» er alt etter sist prosjektlederen så på listen.
-const TYPER = ['meldt', 'kommentar', 'kundesvar', 'kunde', 'mangel'];
+const TYPER = ['meldt', 'kommentar', 'kundesvar', 'kunde', 'mangel', 'dokument'];
 
 route('GET', '/varsler', async ({ user }) =>
   q(

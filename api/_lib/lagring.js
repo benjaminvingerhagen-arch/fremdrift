@@ -13,7 +13,16 @@ export const TILLATTE_TYPER = {
   'image/png': 'png',
   'image/webp': 'webp',
   'application/pdf': 'pdf',
+  // Word og Excel (dokumenthotellet): FDV, kontrakter, mengdelister.
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'docx',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'xlsx',
 };
+
+// Filer nettleseren ikke kan vise selv, lastes ned i stedet for å åpnes.
+export const LASTES_NED = new Set([
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+]);
 
 const lokalMappe = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '.dev-db', 'filer');
 const iDrift = () => Boolean(process.env.VERCEL);
@@ -74,6 +83,10 @@ export function erRiktigType(data, type) {
       return data.subarray(0, 4).toString('latin1') === 'RIFF' && data.subarray(8, 12).toString('latin1') === 'WEBP';
     case 'application/pdf':
       return data.subarray(0, 1024).includes('%PDF-');
+    case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+    case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+      // Word- og Excel-filer er zip-arkiver; innholdet må vise hvilken av dem det er.
+      return start(0x50, 0x4b, 0x03, 0x04) && data.includes(type.includes('word') ? 'word/' : 'xl/');
     default:
       return false;
   }

@@ -3,6 +3,8 @@ import { one, transaction } from '../db.js';
 import { logg } from '../http.js';
 import { nyNokkel } from '../auth.js';
 import { iDag, leggTilDager, erHelg, sjekkpunkter } from '../../../shared/plan.js';
+import { lagreFil } from '../lagring.js';
+import { enkelPdf, EKSEMPEL_DOKUMENTER } from '../eksempeldata.js';
 
 // Eksempelprosjekt til demonstrasjon: en ferdig utfylt enebolig med plan, fag i alle
 // statuser, milepæler, sjekkpunkter, mangler, dagbok, et spørsmål til kunden og en
@@ -139,6 +141,24 @@ route('POST', '/eksempelprosjekt', async ({ user }) => {
     ]);
     return p.id;
   });
+  // Eksempeldokumenter i dokumenthotellet. Mangler fillagring, blir prosjektet laget uten dem.
+  try {
+    for (const d of EKSEMPEL_DOKUMENTER) {
+      const data = enkelPdf(d.tittel, d.linjer);
+      const nokkel = await lagreFil({ prosjektId: id, type: 'application/pdf', data });
+      const v = await one(
+        'INSERT INTO vedlegg (prosjekt_id, nokkel, type, navn, storrelse, opplastet_av) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id',
+        [id, nokkel, 'application/pdf', `${d.tittel}.pdf`, data.length, user.id],
+      );
+      await one(
+        `INSERT INTO dokumenter (prosjekt_id, vedlegg_id, tittel, kategori, synlig_for_kunde, synlig_for_fag, lagt_til_av)
+         VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
+        [id, v.id, d.tittel, d.kategori, d.kunde, d.fag, user.id],
+      );
+    }
+  } catch (err) {
+    console.warn('Eksempeldokumentene ble ikke laget:', err.message);
+  }
   await logg(id, user, 'Lagde eksempelprosjektet');
   return one('SELECT id, navn FROM prosjekter WHERE id = $1', [id]);
 });
