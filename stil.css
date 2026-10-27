@@ -8,20 +8,20 @@
   --surface-3: #f0ede7;
   --line: #e3dfd7;
   --line-soft: #eeebe5;
-  --fg: #16212c;
-  --fg-2: #35414d;
+  --fg: #14231b;
+  --fg-2: #34443b;
   --muted: #69737d;
   --muted-2: #8f979f;
 
-  --ink: #16212c;
-  --ink-2: #1f2c39;
-  --ink-line: #2c3a48;
-  --fg-on-ink: #eef1f4;
-  --muted-on-ink: #9aa6b2;
+  --ink: #173a2a;
+  --ink-2: #1d4532;
+  --ink-line: #2b5440;
+  --fg-on-ink: #eef3f0;
+  --muted-on-ink: #9bb0a4;
 
-  --brand: #1f4e79;
-  --brand-2: #2a6aa3;
-  --brand-soft: #e6eef7;
+  --brand: #1d5b43;
+  --brand-2: #2b7a55;
+  --brand-soft: #e5f1ea;
   --signal: #e8590c;
   --signal-soft: #fdeee4;
 
@@ -35,15 +35,15 @@
   --fare-fg: #9c2a12;
   --varsel-bg: #fdf0da;
   --varsel-fg: #8a5300;
-  --aktiv-bg: #e4eef8;
-  --aktiv-fg: #1f4e79;
+  --aktiv-bg: #e3f0e8;
+  --aktiv-fg: #1d5b43;
   --snart-bg: #faf5e1;
   --snart-fg: #6c5a10;
   --noytral-bg: #f0eee9;
   --noytral-fg: #5b636c;
 
   /* Gantt */
-  --g-kritisk: #1b2b3c;
+  --g-kritisk: #172a20;
   --g-hoy: #2a6aa3;
   --g-normal: #8fb7da;
   --g-tentativ: #c3cdd6;
@@ -67,9 +67,9 @@
   --r-lg: 16px;
   --r-xl: 22px;
   --r-full: 999px;
-  --skygge-1: 0 1px 2px rgba(22, 33, 44, 0.05), 0 1px 1px rgba(22, 33, 44, 0.03);
-  --skygge-2: 0 8px 28px rgba(22, 33, 44, 0.1), 0 2px 6px rgba(22, 33, 44, 0.05);
-  --skygge-3: 0 24px 60px rgba(22, 33, 44, 0.22);
+  --skygge-1: 0 1px 2px rgba(20, 35, 27, 0.05), 0 1px 1px rgba(20, 35, 27, 0.03);
+  --skygge-2: 0 8px 28px rgba(20, 35, 27, 0.1), 0 2px 6px rgba(20, 35, 27, 0.05);
+  --skygge-3: 0 24px 60px rgba(20, 35, 27, 0.22);
   --sidebar: 248px;
   --kontroll: 42px;
 }
@@ -222,7 +222,7 @@ select { appearance: none; padding-right: 34px; background-image: url("data:imag
 .meny-prosjekt { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; align-items: center; padding: 8px 10px; }
 .meny-prosjekt .navn { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .meny-prosjekt .pst { font-family: var(--mono); font-size: 11.5px; color: var(--muted-on-ink); }
-.meny-prosjekt .bar { grid-column: 1 / -1; height: 3px; background: #2c3a48; }
+.meny-prosjekt .bar { grid-column: 1 / -1; height: 3px; background: #2b5440; }
 .meny-prosjekt .bar span { background: var(--logo-accent); }
 .meny-lenke:is(button) { width: 100%; background: none; border: 0; font-family: inherit; text-align: left; cursor: pointer; }
 /* Bunnen: hvem som er logget inn, og det som gjelder kontoen – meld feil, innstillinger,
@@ -451,10 +451,10 @@ select { appearance: none; padding-right: 34px; background-image: url("data:imag
 .prosjektnett { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 18px; }
 .pkort { overflow: hidden; display: flex; flex-direction: column; text-decoration: none !important; color: inherit; transition: box-shadow .15s, transform .15s; }
 .pkort:hover { box-shadow: var(--skygge-2); transform: translateY(-2px); }
-.pkort .bilde { height: 132px; background: linear-gradient(135deg, #22374b 0%, #1f4e79 55%, #2a6aa3 100%); position: relative; }
+.pkort .bilde { height: 132px; background: linear-gradient(135deg, #1f3d2e 0%, #1d5b43 55%, #2b7a55 100%); position: relative; }
 .pkort .bilde img { width: 100%; height: 100%; object-fit: cover; }
 .pkort .bilde .merke { position: absolute; left: 14px; bottom: 12px; }
-.pkort .bilde .stempel { position: absolute; right: 14px; top: 12px; background: rgba(22,33,44,.62); backdrop-filter: blur(6px); color: #fff; border-radius: var(--r-full); padding: 4px 11px; font-size: 12px; font-weight: 600; }
+.pkort .bilde .stempel { position: absolute; right: 14px; top: 12px; background: rgba(20, 35, 27,.62); backdrop-filter: blur(6px); color: #fff; border-radius: var(--r-full); padding: 4px 11px; font-size: 12px; font-weight: 600; }
 .pkort .bilde::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 50%, rgba(10,18,26,.35)); }
 .pkort .bilde.tom-bilde::before { content: ""; position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,.07) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.07) 1px, transparent 1px); background-size: 22px 22px; }
 .pkort .innhold { padding: 16px 18px 18px; display: grid; gap: 12px; }
@@ -492,7 +492,7 @@ select { appearance: none; padding-right: 34px; background-image: url("data:imag
 .bildestripe { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; margin-top: 10px; }
 .bildestripe img, .bildestripe .bilde-plass { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 10px; background: var(--surface-3); }
 .bildestripe .fjern { position: relative; }
-.bildestripe .fjern button { position: absolute; top: 4px; right: 4px; width: 26px; height: 26px; border-radius: 50%; border: 0; background: rgba(22,33,44,.7); color: #fff; display: grid; place-items: center; cursor: pointer; }
+.bildestripe .fjern button { position: absolute; top: 4px; right: 4px; width: 26px; height: 26px; border-radius: 50%; border: 0; background: rgba(20, 35, 27,.7); color: #fff; display: grid; place-items: center; cursor: pointer; }
 .bildestripe .fjern button .ikon { width: 14px; height: 14px; }
 .beslutning { padding: 16px 20px; border-top: 1px solid var(--line-soft); display: grid; gap: 6px; }
 .beslutning:first-of-type { border-top: 0; }
@@ -702,7 +702,7 @@ body.har-modal { overflow: hidden; }
 .db-bilder:empty { display: none; }
 .db-bilde { position: relative; width: 84px; height: 84px; border-radius: var(--r-sm); overflow: hidden; background: var(--surface-3); }
 .db-bilde img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.db-bilde .ikon-knapp { position: absolute; top: 4px; right: 4px; width: 26px; height: 26px; background: rgba(22,33,44,.7); color: #fff; border-radius: 50%; }
+.db-bilde .ikon-knapp { position: absolute; top: 4px; right: 4px; width: 26px; height: 26px; background: rgba(20, 35, 27,.7); color: #fff; border-radius: 50%; }
 .db-bilde.velg input { position: absolute; top: 6px; right: 6px; width: 20px; height: 20px; }
 .db-liste { list-style: none; margin: 0; padding: 0; }
 .db-liste li { border-top: 1px solid var(--line-soft); }
@@ -873,7 +873,7 @@ body.kundeside { background: #f4f2ed; font-size: 15px; }
 .k-glass-tall span { font-size: 12.5px; color: rgba(255,255,255,.7); }
 
 .k-innhold { max-width: 1120px; margin: -34px auto 0; padding: 0 24px 40px; position: relative; display: grid; gap: 22px; }
-.k-kort { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 22px 24px; box-shadow: 0 1px 2px rgba(22,33,44,.04), 0 10px 30px rgba(22,33,44,.05); }
+.k-kort { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 22px 24px; box-shadow: 0 1px 2px rgba(20, 35, 27,.04), 0 10px 30px rgba(20, 35, 27,.05); }
 .k-tittel { display: flex; gap: 10px; align-items: center; font-size: 18px; letter-spacing: -0.02em; margin-bottom: 14px; }
 .k-tittel .ikon { width: 20px; height: 20px; color: var(--signal); }
 .k-merke { background: var(--signal); color: #fff; font-size: 12px; border-radius: 999px; padding: 2px 9px; font-family: var(--mono); }
@@ -883,7 +883,7 @@ body.kundeside { background: #f4f2ed; font-size: 15px; }
 .k-tom { color: var(--muted); }
 
 .k-tallrad { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
-.k-tall { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 18px 20px; display: grid; gap: 6px; box-shadow: 0 10px 30px rgba(22,33,44,.06); }
+.k-tall { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 18px 20px; display: grid; gap: 6px; box-shadow: 0 10px 30px rgba(20, 35, 27,.06); }
 .k-tall span { font-size: 12.5px; font-weight: 600; color: var(--muted); }
 .k-tall strong { font-size: 28px; letter-spacing: -0.035em; line-height: 1.1; }
 .k-tall strong.k-tall-tekst { font-size: 18px; letter-spacing: -0.015em; line-height: 1.25; }
@@ -906,7 +906,7 @@ body.kundeside { background: #f4f2ed; font-size: 15px; }
 .k-hake .ikon { width: 15px; height: 15px; stroke-width: 2.4; }
 
 .k-beslutninger { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
-.k-beslutning { display: grid; gap: 12px; border-color: #f2cdb2; background: linear-gradient(180deg, #fffaf6, #fff); box-shadow: 0 0 0 4px var(--signal-soft), 0 10px 30px rgba(22,33,44,.05); }
+.k-beslutning { display: grid; gap: 12px; border-color: #f2cdb2; background: linear-gradient(180deg, #fffaf6, #fff); box-shadow: 0 0 0 4px var(--signal-soft), 0 10px 30px rgba(20, 35, 27,.05); }
 .k-beslutning h3 { font-size: 17px; }
 .k-frist { display: flex; gap: 6px; align-items: center; font-size: 13px; color: var(--muted); margin-top: 4px; }
 .k-frist .ikon { width: 15px; height: 15px; }
