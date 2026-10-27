@@ -75,3 +75,5 @@ Bygglet m.fl.), tilpasset små byggefirma og håndverkere.
   `/app` (gamle `#/`-lenker sendes videre). Bunnen av menyen samler Min profil, Meld feil,
   Innstillinger og Logg ut, og ny side Innstillinger (profil, firma, henvendelser).
   Produktnavnet samlet i `shared/merke.js`.
+- 2026-10: Ansatte og leverandører ser hele planen (alle fag, liste og Gantt) i prosjektene de er
+  med i, bare til lesing. Egne oppgaver er uthevet. Kan slås av per prosjekt («Fagene ser hele planen»).

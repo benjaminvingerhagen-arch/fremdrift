@@ -278,6 +278,53 @@ function plan(el, ctx) {
   tegn();
 }
 
+// Hele planen til lesing, for ansatte og leverandører. Samme visning som prosjektlederen
+// har, men uten godkjenning, redigering, import og forskyving.
+export function lesePlan(el, ctx) {
+  const { oppgaver } = ctx;
+  ctx.lesemodus = true;
+  ctx.personer ||= [];
+  if (!['alle', 'apne', 'mine', 'uke'].includes(planValg.vis)) planValg.vis = 'alle';
+  const fagValg = [...new Set(oppgaver.map((o) => o.fag || ''))].filter(Boolean).sort((a, b) => a.localeCompare(b, 'nb'));
+  el.innerHTML = html`
+    <div class="verktoy">
+      <div class="sok">${icon('search')}<input type="search" placeholder="Søk i planen" value="${planValg.sok}" data-sok></div>
+      <select data-fag aria-label="Fag"><option value="">Alle fag</option>${fagValg.map((f) => html`<option ${planValg.fag === f ? 'selected' : ''}>${f}</option>`)}</select>
+      <select data-vis aria-label="Vis">
+        ${[['alle', 'Alle oppgaver'], ['mine', 'Bare mine'], ['apne', 'Bare åpne'], ['uke', 'Denne og neste uke']].map(
+          ([k, t]) => html`<option value="${k}" ${planValg.vis === k ? 'selected' : ''}>${t}</option>`,
+        )}
+      </select>
+      <span class="spacer"></span>
+      <div class="segment" role="group" aria-label="Visning">
+        <button data-modus="gantt" class="${planValg.modus === 'gantt' ? 'aktiv' : ''}">${icon('gantt')} Gantt</button>
+        <button data-modus="liste" class="${planValg.modus === 'liste' ? 'aktiv' : ''}">${icon('list')} Liste</button>
+      </div>
+    </div>
+    <div id="plan"></div>`.toString();
+  const tegn = () => tegnPlan($('#plan', el), ctx);
+  $('[data-sok]', el).addEventListener('input', (e) => {
+    planValg.sok = e.target.value;
+    tegn();
+  });
+  $('[data-fag]', el).addEventListener('change', (e) => {
+    planValg.fag = e.target.value;
+    tegn();
+  });
+  $('[data-vis]', el).addEventListener('change', (e) => {
+    planValg.vis = e.target.value;
+    tegn();
+  });
+  $$('[data-modus]', el).forEach((b) =>
+    b.addEventListener('click', () => {
+      planValg.modus = b.dataset.modus;
+      $$('[data-modus]', el).forEach((x) => x.classList.toggle('aktiv', x === b));
+      tegn();
+    }),
+  );
+  tegn();
+}
+
 function filtrer(oppgaver, dag) {
   const sok = planValg.sok.trim().toLowerCase();
   const ukeSlutt = leggTilDager(dag, 13 - ukedag(dag));
@@ -290,6 +337,7 @@ function filtrer(oppgaver, dag) {
     if (planValg.vis === 'venter' && s !== 'meldt') return false;
     if (planValg.vis === 'forsinket' && s !== 'forsinket') return false;
     if (planValg.vis === 'uke' && (o.til < ukeStart || o.fra > ukeSlutt)) return false;
+    if (planValg.vis === 'mine' && !o.min) return false;
     return true;
   });
 }
@@ -327,23 +375,25 @@ function tegnPlan(el, ctx) {
 
   const radHtml = (o) => {
     const s = oppgaveStatus(o, dag);
-    const hvem = ctx.personer.find((x) => x.id === o.ansvarlig_id)?.navn;
+    const les = ctx.lesemodus;
+    const hvem = les ? null : ctx.personer.find((x) => x.id === o.ansvarlig_id)?.navn;
+    const under = les ? [o.min ? 'Din oppgave' : null, o.kunde_styrt ? 'Kunden styrer' : null, o.merknad].filter(Boolean).join(' · ') : [hvem, o.merknad].filter(Boolean).join(' · ');
     const venstre = dagerMellom(start, o.fra) * DAG_BREDDE + 2;
     const bredde = (dagerMellom(o.fra, o.til) + 1) * DAG_BREDDE - 4;
     const klasse = s === 'ferdig' ? 'ferdig' : s === 'meldt' ? 'meldt' : s === 'forsinket' ? 'forsinket' : o.prioritet;
-    return html`<div class="plan-rad ${s === 'ferdig' ? 'ferdig' : ''}" data-oppgave="${o.id}">
+    return html`<div class="plan-rad ${s === 'ferdig' ? 'ferdig' : ''} ${les && o.min ? 'min' : ''}" data-oppgave="${o.id}">
       <div class="pc pv">
-        <button class="huk ${o.godkjent ? 'ferdig' : o.ferdig_meldt ? 'meldt' : ''}" data-huk="${o.id}"
+        ${les ? html`<span class="huk les ${o.godkjent ? 'ferdig' : o.ferdig_meldt ? 'meldt' : ''}" aria-hidden="true">${icon('check')}</span>` : html`<button class="huk ${o.godkjent ? 'ferdig' : o.ferdig_meldt ? 'meldt' : ''}" data-huk="${o.id}"
           title="${o.godkjent ? 'Godkjent – klikk for å ta tilbake' : o.ferdig_meldt ? 'Meldt ferdig – klikk for å godkjenne' : 'Klikk for å godkjenne som ferdig'}"
-          aria-label="Godkjenn ${o.tittel}">${icon('check')}</button>
+          aria-label="Godkjenn ${o.tittel}">${icon('check')}</button>`}
         <span class="nr">${o.nr || ''}</span>
-        <span class="tittelcelle"><strong>${o.uleste ? html`<span class="ulest-prikk" title="${o.uleste} ny melding"></span>` : ''}${o.tittel}</strong><small><span class="vis-mobil">${ddmm(o.fra)}–${ddmm(o.til)} · </span>${[hvem, o.merknad].filter(Boolean).join(' · ') || ' '}</small></span>
+        <span class="tittelcelle"><strong>${o.uleste ? html`<span class="ulest-prikk" title="${o.uleste} ny melding"></span>` : ''}${o.tittel}</strong><small><span class="vis-mobil">${ddmm(o.fra)}–${ddmm(o.til)}${under ? ' · ' : ''}</span>${under || ' '}</small></span>
         <span class="datoer skjul-kompakt">${ddmm(o.fra)}–${ddmm(o.til)}</span>
         <span class="prio ${o.prioritet} skjul-kompakt">${PRIORITET_TEKST[o.prioritet]}</span>
         ${statusChip(o, dag)}
       </div>
       ${gantt ? html`<div class="pc spor" style="width:${antall * DAG_BREDDE}px">${bakgrunn}
-        <div class="g-bar ${klasse} ${bredde < 60 ? 'kort-bar' : ''}" style="left:${venstre}px;width:${bredde}px" title="${o.tittel} · ${ddmm(o.fra)}–${ddmm(o.til)}">${bredde >= 60 ? o.tittel : ''}</div>
+        <div class="g-bar ${klasse} ${bredde < 60 ? 'kort-bar' : ''} ${les && o.min ? 'min' : ''}" style="left:${venstre}px;width:${bredde}px" title="${o.tittel} · ${ddmm(o.fra)}–${ddmm(o.til)}">${bredde >= 60 ? o.tittel : ''}</div>
       </div>` : ''}
     </div>`;
   };
@@ -386,6 +436,7 @@ function tegnPlan(el, ctx) {
   const rull = $('.plan-rull', el);
   if (gantt) rull.scrollLeft = Math.max(0, dagerMellom(start, dag) * DAG_BREDDE - 3 * DAG_BREDDE);
 
+  if (ctx.lesemodus) return;
   $$('[data-oppgave]', el).forEach((r) =>
     r.addEventListener('click', (e) => {
       if (e.target.closest('[data-huk]')) return;
@@ -737,6 +788,8 @@ function innstillinger(el, ctx) {
           <label class="felt"><span>E-post</span><input type="email" name="kunde_epost" value="${p.kunde_epost || ''}"></label>
           <label class="felt"><span>Telefon</span><input type="tel" name="kunde_telefon" value="${p.kunde_telefon || ''}"></label></div>
         <label class="felt"><span>Kort om prosjektet (vises for kunden)</span><textarea name="beskrivelse">${p.beskrivelse || ''}</textarea></label>
+        <label class="avkrysning"><input type="checkbox" name="plan_for_fag" ${p.plan_for_fag !== false ? 'checked' : ''}>
+          <span>Fagene ser hele planen<small>Ansatte og leverandører med oppgaver i prosjektet kan se alle fag i planen og Gantt-visningen, men ikke endre noe. Merknader, ansvarlige og meldinger på andres oppgaver vises ikke.</small></span></label>
         <div class="knapperad" style="margin-top:4px"><button type="button" class="knapp lys" data-arkiver>${p.arkivert ? 'Gjenåpne prosjektet' : 'Avslutt prosjektet'}</button>
           <button type="button" class="knapp lys text-fare" data-slett>Slett …</button><span class="spacer"></span><button class="knapp primar">Lagre</button></div>
       </form>

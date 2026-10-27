@@ -597,6 +597,26 @@ body.har-modal { overflow: hidden; }
 .henv .meta { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; }
 .henv .meta a { color: inherit; display: inline-flex; gap: 6px; align-items: center; }
 .henv .meta .ikon { width: 14px; height: 14px; }
+/* Hele planen for fagene */
+.prosjektplaner { display: grid; }
+.prosjektplan { display: grid; grid-template-columns: auto 1fr auto; gap: 14px; align-items: center; padding: 14px 18px; color: inherit; text-decoration: none !important; border-top: 1px solid var(--line-soft); }
+.prosjektplan:first-child { border-top: 0; }
+.prosjektplan:hover { background: var(--surface-2); }
+.prosjektplan small { display: block; color: var(--muted); font-size: 12.5px; }
+.prosjektplan > .ikon { color: var(--muted); }
+.prosjektplan .kalender-ikon { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 10px; background: var(--surface-3); color: var(--fg-2); }
+.mine-topp.kompakt { padding-bottom: 22px; }
+.mine-topp .tilbake { display: inline-flex; align-items: center; gap: 4px; color: var(--muted-on-ink); font-size: 13.5px; font-weight: 550; margin: 14px 0 6px; text-decoration: none; }
+.mine-topp .tilbake:hover { color: #fff; }
+.mine-topp .tilbake .ikon { width: 16px; height: 16px; }
+.fagplan-innhold { max-width: 1280px; margin: 0 auto; padding-top: 22px; }
+.fagplan-hjelp { margin-bottom: 14px; max-width: 72ch; }
+.fagplan-feil { margin-top: 30px; display: grid; gap: 14px; justify-items: start; }
+.plan-rad.min .pv { box-shadow: inset 3px 0 0 var(--signal); background: var(--signal-soft); }
+.g-bar.min { outline: 2px solid var(--signal); outline-offset: 1px; }
+.huk.les { cursor: default; }
+.huk.les:not(.ferdig):not(.meldt) { opacity: .45; }
+.fagplan .mine-topp .indre { max-width: 1232px; }
 .mine-bunn { text-align: center; margin-top: 14px; line-height: 2.2; }
 .lenkeknapp { background: none; border: 0; padding: 0; font: inherit; color: var(--fg-2); text-decoration: underline; text-underline-offset: 2px; cursor: pointer; display: inline-flex; gap: 4px; align-items: center; }
 .lenkeknapp .ikon { width: 14px; height: 14px; }

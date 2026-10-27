@@ -82,6 +82,11 @@ export async function mineApp(root) {
       ${seksjon('Meldt ferdig', grupper.meldt, 'checkCircle')}
       ${grupper.ferdig.length ? html`<details><summary class="gruppe-tittel" style="cursor:pointer;list-style:none">${icon('check')} Godkjent <span class="mono">${grupper.ferdig.length}</span> <span class="muted" style="text-transform:none;letter-spacing:0;font-weight:500">– vis</span></summary>
         <div style="display:grid;gap:16px;margin-top:14px">${grupper.ferdig.map(kort)}</div></details>` : ''}
+      ${data.prosjekter.some((p) => p.plan_for_fag) ? html`<div class="gruppe-tittel">${icon('gantt')} Hele planen</div>
+        <div class="kort prosjektplaner">${data.prosjekter.filter((p) => p.plan_for_fag).map((p) => html`<a class="prosjektplan" href="#/mine/plan/${p.id}">
+          <span class="kalender-ikon">${icon('gantt')}</span>
+          <span><strong>${p.navn}</strong><small>Alle fag i planen${p.innflytting ? ` · innflytting ${datoKort(p.innflytting)}` : ''}</small></span>
+          ${icon('chevronRight')}</a>`)}</div>` : ''}
       <div class="kort kalender-kort">
         <span class="kalender-ikon">${icon('calendar')}</span>
         <div><strong>Oppgavene i kalenderen din</strong><p class="small muted">Få oppgavene og viktige datoer rett i kalenderen på telefonen. Den oppdateres av seg selv når planen endres.</p></div>

@@ -241,9 +241,12 @@ CREATE TABLE IF NOT EXISTS henvendelser (
   opprettet TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS henvendelser_type_idx ON henvendelser (type, opprettet DESC);
+
+-- Versjon 8: om ansatte og leverandører får se hele planen i prosjektet (alle fag, bare lesing).
+ALTER TABLE prosjekter ADD COLUMN IF NOT EXISTS plan_for_fag BOOLEAN NOT NULL DEFAULT true;
 `;
 
-const VERSJON = 7;
+const VERSJON = 8;
 let klar = null;
 
 export function ensureSchema() {
