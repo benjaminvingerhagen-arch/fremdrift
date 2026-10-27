@@ -620,6 +620,70 @@ body.har-modal { overflow: hidden; }
 .mine-bunn { text-align: center; margin-top: 14px; line-height: 2.2; }
 .lenkeknapp { background: none; border: 0; padding: 0; font: inherit; color: var(--fg-2); text-decoration: underline; text-underline-offset: 2px; cursor: pointer; display: inline-flex; gap: 4px; align-items: center; }
 .lenkeknapp .ikon { width: 14px; height: 14px; }
+/* Økonomi fra Tripletex */
+.banner:not(.ok):not(.fare):not(.signal) { background: var(--surface-3); color: var(--fg-2); font-weight: 520; }
+.ok-hode { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin-bottom: 16px; }
+.ok-kilde { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; flex-wrap: wrap; }
+.ok-kilde .ikon { width: 16px; height: 16px; color: var(--muted); }
+.ok-meter { position: relative; height: 10px; border-radius: var(--r-full); background: var(--ring-bg); margin-top: 8px; }
+.ok-meter .brukt { position: absolute; inset: 0 auto 0 0; border-radius: inherit; background: var(--brand); }
+.ok-meter .brukt.over { background: var(--fare); }
+.ok-meter .merke { position: absolute; top: -4px; bottom: -4px; width: 3px; margin-left: -1.5px; border-radius: 2px; background: var(--ink); box-shadow: 0 0 0 2px var(--surface); }
+.tall .lenkeknapp { margin-top: 6px; align-self: flex-start; }
+.tall .hint .ikon { width: 13px; height: 13px; vertical-align: -2px; }
+.ok-linjer { display: grid; gap: 1px; margin-top: 8px !important; }
+.ok-linjer b { font-weight: 600; }
+.ok-budsjett { display: grid; gap: 8px; }
+.ok-budsjett label { display: grid; gap: 3px; font-size: 12px; color: var(--muted); font-weight: 600; }
+.ok-budsjett input { height: 34px; }
+.ok-budsjett .knapperad { margin-top: 2px; }
+.ok-diagrammer { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px; }
+.ok-tre { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-bottom: 18px; }
+.ok-stolper { display: grid; grid-template-columns: repeat(var(--antall), minmax(0, 1fr)); gap: 4px; align-items: end; height: 190px; padding-top: 26px; border-bottom: 1px solid var(--line); }
+.stolpe { position: relative; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; height: 100%; outline: none; cursor: default; }
+.stolpe .soyle { width: min(100%, 36px); border-radius: 4px 4px 0 0; background: var(--brand-2); }
+.ok-stolper.timer .soyle { background: var(--brand); }
+.stolpe .soyle.neg { background: var(--muted-2); }
+.stolpe small { position: absolute; bottom: -20px; font-size: 10.5px; color: var(--muted); white-space: nowrap; font-family: var(--mono); }
+.stolpe .siste { position: absolute; top: -22px; font-size: 11.5px; font-weight: 650; color: var(--fg-2); white-space: nowrap; font-family: var(--mono); }
+.stolpe .verdi-tips { position: absolute; bottom: calc(100% + 4px); left: 50%; transform: translateX(-50%); background: var(--ink); color: #fff; font-size: 12px; font-weight: 600; padding: 4px 8px; border-radius: 6px; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity .12s; z-index: 2; }
+.stolpe:hover .verdi-tips, .stolpe:focus-visible .verdi-tips { opacity: 1; }
+.stolpe:hover .soyle, .stolpe:focus-visible .soyle { filter: brightness(.88); }
+.stolpe:hover .siste, .stolpe:focus-visible .siste { visibility: hidden; }
+.ok-diagrammer .kort-innhold { padding-bottom: 32px; }
+.ok-fordeling { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.ok-fordeling li { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; font-size: 13.5px; }
+.ok-fordeling .navn { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ok-fordeling .bar { grid-column: 1 / -1; height: 6px; }
+.ok-tabell-rull { overflow-x: auto; padding: 0 20px 16px; }
+.ok-tabell { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.ok-tabell th { text-align: left; font-size: 11.5px; font-weight: 650; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+.ok-tabell td { padding: 9px 8px; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
+.ok-tabell td small { display: block; color: var(--muted); font-size: 12px; }
+.ok-tabell td strong { font-weight: 560; }
+.ok-tabell .tall-k { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.ok-liste { list-style: none; margin: 0; padding: 0 20px 14px; }
+.ok-liste li { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; border-top: 1px solid var(--line-soft); font-size: 13.5px; }
+.ok-liste li:first-child { border-top: 0; }
+.ok-liste small { display: block; color: var(--muted); font-size: 12px; }
+.ok-liste strong { font-weight: 560; }
+.ok-liste .mono { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.ok-oppsett { display: grid; gap: 12px; }
+.ok-oppsett h2 { display: flex; gap: 8px; align-items: center; }
+.ok-oppsett ol { margin: 0; padding-left: 20px; display: grid; gap: 8px; }
+.ok-sok { display: flex; gap: 8px; }
+.ok-sok .sok { flex: 1; position: relative; }
+.ok-sok .sok .ikon { position: absolute; left: 11px; top: 12px; color: var(--muted); width: 17px; height: 17px; }
+.ok-sok .sok input { padding-left: 36px; }
+.ok-treff { list-style: none; margin: 0; padding: 0; display: grid; }
+.ok-treff li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line-soft); font-size: 14px; }
+.ok-treff small { display: block; color: var(--muted); font-size: 12.5px; }
+.ok-fot { margin-top: 6px; max-width: 80ch; }
+@media (max-width: 1100px) { .ok-tre { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 860px) {
+  .ok-diagrammer, .ok-tre { grid-template-columns: 1fr; }
+  .ok-hode .spacer { display: none; }
+}
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 /* Dagbok */
 .db-oppsett { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 24px; align-items: start; }

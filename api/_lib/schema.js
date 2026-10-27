@@ -244,9 +244,22 @@ CREATE INDEX IF NOT EXISTS henvendelser_type_idx ON henvendelser (type, opprette
 
 -- Versjon 8: om ansatte og leverandører får se hele planen i prosjektet (alle fag, bare lesing).
 ALTER TABLE prosjekter ADD COLUMN IF NOT EXISTS plan_for_fag BOOLEAN NOT NULL DEFAULT true;
+
+-- Versjon 9: økonomi fra Tripletex. Prosjektet kobles til et prosjekt i Tripletex, og det
+-- sist hentede sammendraget mellomlagres så dashbordet ikke spør Tripletex ved hver visning.
+ALTER TABLE prosjekter ADD COLUMN IF NOT EXISTS tripletex_id BIGINT;
+ALTER TABLE prosjekter ADD COLUMN IF NOT EXISTS tripletex_navn TEXT;
+ALTER TABLE prosjekter ADD COLUMN IF NOT EXISTS budsjett_kostnad NUMERIC(14, 2);
+ALTER TABLE prosjekter ADD COLUMN IF NOT EXISTS budsjett_timer NUMERIC(10, 2);
+CREATE TABLE IF NOT EXISTS tripletex_buffer (
+  prosjekt_id INT PRIMARY KEY REFERENCES prosjekter(id) ON DELETE CASCADE,
+  tripletex_id BIGINT NOT NULL,
+  data JSONB NOT NULL,
+  hentet TIMESTAMPTZ NOT NULL DEFAULT now()
+);
 `;
 
-const VERSJON = 8;
+const VERSJON = 9;
 let klar = null;
 
 export function ensureSchema() {

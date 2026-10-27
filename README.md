@@ -29,6 +29,29 @@ Forsiden er foreløpig ikke søkbar (`noindex`) – det slås på når navn og d
   `KONTAKT_EPOST` (demo) og `FEILMELDING_EPOST` (feil, ellers `KONTAKT_EPOST`). Adressene står
   bare i Vercel, ikke i koden, siden repoet er offentlig. Avsenderen blir svaradresse.
 
+## Økonomi fra Tripletex
+
+Fanen **Økonomi** i prosjektet viser tall hentet fra Tripletex, bare til lesing og bare for
+prosjektleder: kostnader som er bokført på prosjektet (konto 4000–7999, uten mva.),
+leverandørfakturaer på prosjektet som venter på godkjenning og ikke er bokført ennå, og timene
+som er ført. Sammen med et budsjett (kostnader og timer) som legges inn i fanen, viser den hvor
+mye som er brukt mot hvor langt prosjektet har kommet. Tallene mellomlagres to minutter og
+hentes på nytt av seg selv mens fanen er åpen.
+
+Oppsett:
+
+1. I Tripletex: **Selskap → API-tokens** → lag en ny nøkkel (modulen «Integrasjoner» må være på).
+   Brukeren den lages for, må kunne se prosjektregnskap og timer, og helst godkjenningskøen.
+2. I Vercel: legg nøkkelen inn som `TRIPLETEX_API_TOKEN` og deploy på nytt.
+3. I prosjektet: fanen Økonomi → søk opp og velg prosjektet i Tripletex.
+
+Vanlig integrasjon med søkt tilgang bruker i stedet `TRIPLETEX_CONSUMER_TOKEN` og
+`TRIPLETEX_EMPLOYEE_TOKEN`. `TRIPLETEX_URL` settes til `https://api-test.tripletex.tech/v2` for
+Tripletex sitt testmiljø (standard er `https://tripletex.no/v2`).
+
+Lokalt, uten nøkler, bruker dev-serveren en etterligning av Tripletex med oppdiktede tall
+(`scripts/tripletex-falsk.mjs`), så både appen og testene virker uten tilgang til Tripletex.
+
 ## Bytte navn
 
 Navnet «Fremdrift» står her:

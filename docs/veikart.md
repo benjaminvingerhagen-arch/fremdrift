@@ -31,6 +31,9 @@ Bygglet m.fl.), tilpasset små byggefirma og håndverkere.
 
 ## Krever avklaring med Benjamin
 
+- **Tripletex-nøkkel**: økonomifanen er klar, men `TRIPLETEX_API_TOKEN` må legges inn i Vercel.
+  Senere: fakturert/inntekter og dekningsbidrag per prosjekt, og timeføring fra appen.
+
 - **SMS-varsler** i tillegg til e-post. Krever en SMS-tjeneste med egen nøkkel og kostnad.
 - **Slå på e-post**: koden er klar, men `RESEND` og `MAIL_FROM` er ikke satt i Vercel. Krever
   Resend-konto og et godkjent avsenderdomene.
@@ -77,3 +80,5 @@ Bygglet m.fl.), tilpasset små byggefirma og håndverkere.
   Produktnavnet samlet i `shared/merke.js`.
 - 2026-10: Ansatte og leverandører ser hele planen (alle fag, liste og Gantt) i prosjektene de er
   med i, bare til lesing. Egne oppgaver er uthevet. Kan slås av per prosjekt («Fagene ser hele planen»).
+- 2026-10: Økonomi fra Tripletex: bokførte kostnader, fakturaer til godkjenning og førte timer per
+  prosjekt, med budsjett mot fremdrift. Bare lesing. Lokal etterligning av Tripletex for utvikling og tester.
