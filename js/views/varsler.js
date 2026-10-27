@@ -12,6 +12,7 @@ const TYPE = {
   kundesvar: { ikon: 'help', tone: 'ok', tekst: 'Kundesvar', fane: 'kunde' },
   kunde: { ikon: 'calendar', tone: 'varsel', tekst: 'Kunden', fane: 'plan' },
   mangel: { ikon: 'checkCircle', tone: 'info', tekst: 'Mangel utbedret', fane: 'mangler' },
+  dokument: { ikon: 'folder', tone: 'aktiv', tekst: 'Dokument levert', fane: 'dokumenter' },
 };
 
 function dagOverskrift(ts) {

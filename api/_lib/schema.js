@@ -260,9 +260,26 @@ CREATE TABLE IF NOT EXISTS tripletex_buffer (
 
 -- Versjon 10: eksempelprosjekt til demonstrasjon (oppdiktede data, økonomi uten Tripletex).
 ALTER TABLE prosjekter ADD COLUMN IF NOT EXISTS eksempel BOOLEAN NOT NULL DEFAULT false;
+
+-- Versjon 11: dokumenthotell. Et dokument er en opplastet fil med tittel og kategori, og
+-- prosjektlederen velger om kunden og fagene skal se det.
+CREATE TABLE IF NOT EXISTS dokumenter (
+  id SERIAL PRIMARY KEY,
+  prosjekt_id INT NOT NULL REFERENCES prosjekter(id) ON DELETE CASCADE,
+  vedlegg_id INT NOT NULL REFERENCES vedlegg(id) ON DELETE CASCADE,
+  tittel TEXT NOT NULL,
+  kategori TEXT NOT NULL DEFAULT 'annet',
+  beskrivelse TEXT,
+  synlig_for_kunde BOOLEAN NOT NULL DEFAULT false,
+  synlig_for_fag BOOLEAN NOT NULL DEFAULT false,
+  lagt_til_av INT REFERENCES brukere(id) ON DELETE SET NULL,
+  opprettet TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS dokumenter_prosjekt_idx ON dokumenter (prosjekt_id, opprettet DESC);
+CREATE UNIQUE INDEX IF NOT EXISTS dokumenter_vedlegg_idx ON dokumenter (vedlegg_id);
 `;
 
-const VERSJON = 10;
+const VERSJON = 11;
 let klar = null;
 
 export function ensureSchema() {

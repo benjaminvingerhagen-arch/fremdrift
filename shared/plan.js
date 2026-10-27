@@ -146,3 +146,19 @@ export function mangelStatus(m, dato = iDag()) {
 
 // ---------- Dagbok ----------
 export const VAER = { sol: 'Sol', skyet: 'Skyet', regn: 'Regn', sno: 'Snø', vind: 'Sterk vind', frost: 'Frost' };
+
+// ---------- Dokumenter ----------
+export const DOKUMENT_KATEGORIER = {
+  tegninger: 'Tegninger',
+  kontrakt: 'Kontrakt og avtaler',
+  fdv: 'FDV',
+  samsvar: 'Samsvarserklæringer',
+  hms: 'SHA og HMS',
+  bilder: 'Bilder',
+  annet: 'Annet',
+};
+
+// Mandagen i uken datoen ligger i.
+export function ukeStart(iso) {
+  return leggTilDager(iso, -ukedag(iso));
+}

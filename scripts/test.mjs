@@ -310,6 +310,91 @@ sjekk('kunden ser ikke økonomien', !JSON.stringify((await kunde('GET', `/k/${ny
 sjekk('prosjektet kan kobles fra', (await leder('PUT', `/prosjekter/${p.id}/tripletex`, { tripletex_id: null })).data?.tripletex_id === null);
 await leder('PUT', `/prosjekter/${p.id}/tripletex`, { tripletex_id: 101 });
 
+console.log('Dokumenter:');
+const pdf = new TextEncoder().encode('%PDF-1.4\n1 0 obj << >> endobj\n%%EOF\n');
+const docx = new Uint8Array([0x50, 0x4b, 0x03, 0x04, ...new TextEncoder().encode('....word/document.xml....')]);
+const pdfFil = (await leder('POST', '/vedlegg', pdf, { 'Content-Type': 'application/pdf', 'X-Prosjekt': String(p.id), 'X-Filnavn': Buffer.from('Plantegning.pdf').toString('base64') })).data;
+const docxFil = await leder('POST', '/vedlegg', docx, { 'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'X-Prosjekt': String(p.id) });
+sjekk('Word-fil kan lastes opp', docxFil.status === 200, JSON.stringify(docxFil.data));
+const falskDocx = await leder('POST', '/vedlegg', new Uint8Array([0x50, 0x4b, 0x03, 0x04, 1, 2, 3]), { 'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'X-Prosjekt': String(p.id) });
+sjekk('zip som ikke er Word avvises', falskDocx.status === 400);
+const d1 = await leder('POST', `/prosjekter/${p.id}/dokumenter`, { vedlegg_id: pdfFil.id, tittel: 'Plantegning 1. etg', kategori: 'tegninger', synlig_for_kunde: true });
+sjekk('prosjektleder legger til dokument', d1.status === 200 && d1.data.kategori === 'tegninger' && d1.data.type === 'application/pdf' && d1.data.synlig_for_kunde === true, JSON.stringify(d1.data));
+const d2 = (await leder('POST', `/prosjekter/${p.id}/dokumenter`, { vedlegg_id: docxFil.data.id, tittel: 'Kontrakt' })).data;
+sjekk('dokument uten kategori havner i «Annet»', d2.kategori === 'annet' && !d2.synlig_for_kunde && !d2.synlig_for_fag);
+sjekk('samme fil kan ikke legges inn to ganger', (await leder('POST', `/prosjekter/${p.id}/dokumenter`, { vedlegg_id: pdfFil.id, tittel: 'Igjen' })).status === 409);
+sjekk('fil fra et annet prosjekt avvises', (await leder('POST', `/prosjekter/${annet.id}/dokumenter`, { vedlegg_id: pdfFil.id, tittel: 'Feil' })).status === 400);
+sjekk('ukjent kategori avvises', (await leder('POST', `/prosjekter/${p.id}/dokumenter`, { vedlegg_id: dbBilde.id, tittel: 'x', kategori: 'tull' })).status === 400);
+// Bilder som allerede brukes i prosjektet: i en melding, i dagboken og i en oppdatering.
+const meldBilde = (await lev2('POST', '/vedlegg', png, { 'Content-Type': 'image/png', 'X-Prosjekt': String(p.id) })).data;
+await lev2('POST', `/oppgaver/${oEl.id}/kommentarer`, { tekst: 'Bilde av arbeidet', vedlegg_id: meldBilde.id });
+await leder('PUT', `/prosjekter/${p.id}/dagbok/2026-10-27`, { notat: 'Bilder', bilder: [dbBilde.id] });
+const liste = (await leder('GET', `/prosjekter/${p.id}/dokumenter`)).data;
+sjekk('dokumentlisten har dokumentene', liste.dokumenter.length === 2);
+const kilder = new Set(liste.samlet.flatMap((x) => x.kilder.map((k) => k.kilde)));
+sjekk('bilder fra meldinger, dagbok og oppdateringer samles', ['oppgave', 'dagbok', 'oppdatering'].every((k) => kilder.has(k)), JSON.stringify([...kilder]));
+sjekk('samme bilde vises én gang med alle stedene det brukes', liste.samlet.find((x) => x.vedlegg_id === dbBilde.id)?.kilder.length >= 2);
+sjekk('det som er lagt i dokumentene, vises ikke to ganger', !liste.samlet.some((x) => x.vedlegg_id === pdfFil.id));
+sjekk('leverandør får ikke prosjektets dokumentliste', (await lev2('GET', `/prosjekter/${p.id}/dokumenter`)).status === 403);
+sjekk('leverandør kan ikke legge til dokument som prosjektleder', (await lev2('POST', `/prosjekter/${p.id}/dokumenter`, { vedlegg_id: dbBilde.id, tittel: 'x' })).status === 403);
+sjekk('leverandør kan ikke endre dokument', (await lev2('PUT', `/dokumenter/${d2.id}`, { synlig_for_kunde: true })).status === 403);
+
+const kundeDok = (await kunde('GET', `/k/${nyLenke.kunde_token}`)).data.dokumenter;
+sjekk('kunden ser bare dokumenter som er delt', kundeDok.length === 1 && kundeDok[0].tittel === 'Plantegning 1. etg');
+sjekk('kunden ser ikke hvem som la inn dokumentet', !('lagt_til_navn' in kundeDok[0]) && !('lagt_til_av' in kundeDok[0]));
+sjekk('kunden kan åpne delt dokument', (await kunde('GET', `/k/${nyLenke.kunde_token}/fil/${pdfFil.id}`)).status === 200);
+sjekk('kunden kan ikke åpne dokument som ikke er delt', (await kunde('GET', `/k/${nyLenke.kunde_token}/fil/${docxFil.data.id}`)).status === 404);
+const ned = await fetch(`${BASE}/api/vedlegg/${docxFil.data.id}`, { headers: { cookie: '' } });
+sjekk('uinnlogget får ikke filen', ned.status === 401);
+
+sjekk('fagene ser ikke dokument som ikke er delt', (await lev2('GET', `/vedlegg/${docxFil.data.id}`)).status === 403);
+const mineDok0 = (await lev2('GET', '/mine/dokumenter')).data;
+sjekk('fagene ser ikke udelte dokumenter i listen', mineDok0.prosjekter.some((x) => x.id === p.id) && !mineDok0.dokumenter.length, JSON.stringify(mineDok0));
+await leder('PUT', `/dokumenter/${d2.id}`, { synlig_for_fag: true });
+const mineDok = (await lev2('GET', '/mine/dokumenter')).data;
+sjekk('fagene ser dokument delt med fagene', mineDok.dokumenter.length === 1 && mineDok.dokumenter[0].id === d2.id && !('lagt_til_navn' in mineDok.dokumenter[0]));
+sjekk('fagene kan åpne delt dokument', (await lev2('GET', `/vedlegg/${docxFil.data.id}`)).status === 200);
+const nedlast = await fetch(`${BASE}/api/k/${nyLenke.kunde_token}/fil/${pdfFil.id}`);
+sjekk('PDF vises i nettleseren', /^inline/.test(nedlast.headers.get('content-disposition') || ''));
+
+const ror = (await leder('POST', '/personer', { navn: 'Rørleggeren', firma: 'Rør AS', fag: 'Rørlegger', rolle: 'leverandor' })).data;
+const rorKlient = klient();
+await rorKlient('GET', `/inn/${ror.nokkel}`);
+sjekk('leverandør uten oppgaver i prosjektet ser ingen dokumenter', (await rorKlient('GET', '/mine/dokumenter')).data.dokumenter.length === 0);
+sjekk('leverandør uten oppgaver får ikke delt dokument', (await rorKlient('GET', `/vedlegg/${docxFil.data.id}`)).status === 403);
+sjekk('leverandør uten oppgaver kan ikke levere dokument', (await rorKlient('POST', `/mine/prosjekter/${p.id}/dokumenter`, { vedlegg_id: dbBilde.id, tittel: 'x' })).status === 403);
+
+const samsvarFil = (await lev2('POST', '/vedlegg', pdf, { 'Content-Type': 'application/pdf', 'X-Prosjekt': String(p.id) })).data;
+sjekk('faget kan ikke levere andres filer', (await lev2('POST', `/mine/prosjekter/${p.id}/dokumenter`, { vedlegg_id: pdfFil.id, tittel: 'x' })).status >= 400);
+const levertFil = await lev2('POST', `/mine/prosjekter/${p.id}/dokumenter`, { vedlegg_id: samsvarFil.id, tittel: 'Samsvarserklæring', kategori: 'samsvar', synlig_for_kunde: true });
+sjekk('faget leverer samsvarserklæring', levertFil.status === 200, JSON.stringify(levertFil.data));
+const levert = (await leder('GET', `/prosjekter/${p.id}/dokumenter`)).data.dokumenter.find((x) => x.id === levertFil.data.id);
+sjekk('det faget leverer er ikke delt med kunden', levert && !levert.synlig_for_kunde && !levert.synlig_for_fag && levert.lagt_til_rolle === 'leverandor');
+sjekk('prosjektleder får varsel om levert dokument', (await leder('GET', '/varsler')).data.some((v) => v.type === 'dokument'));
+sjekk('faget ser eget dokument', (await lev2('GET', '/mine/dokumenter')).data.dokumenter.some((x) => x.id === levertFil.data.id && x.eget));
+sjekk('faget kan ikke slette prosjektlederens dokument', (await lev2('DELETE', `/mine/dokumenter/${d2.id}`)).status === 404);
+sjekk('faget kan slette eget dokument', (await lev2('DELETE', `/mine/dokumenter/${levertFil.data.id}`)).status === 200);
+sjekk('filen slettes med dokumentet', (await leder('GET', `/vedlegg/${samsvarFil.id}`)).status === 404);
+const bildeDok = (await leder('POST', `/prosjekter/${p.id}/dokumenter`, { vedlegg_id: dbBilde.id, tittel: 'Fra dagboken', kategori: 'bilder' })).data;
+await leder('DELETE', `/dokumenter/${bildeDok.id}`);
+sjekk('fil som brukes andre steder, blir igjen når dokumentet slettes', (await leder('GET', `/vedlegg/${dbBilde.id}`)).status === 200);
+
+console.log('Ukesoppsummering:');
+sjekk('leverandør får ikke ukesoppsummeringen', (await lev2('GET', `/prosjekter/${p.id}/ukerapport`)).status === 403);
+const uke = await leder('GET', `/prosjekter/${p.id}/ukerapport`);
+sjekk('ukesoppsummering for denne uken', uke.status === 200 && uke.data.pagar === true && uke.data.neste === null, JSON.stringify(uke.data).slice(0, 300));
+const iDagTest = uke.data.i_dag;
+const godkjentIDag = (await leder('GET', `/prosjekter/${p.id}`)).data.oppgaver.filter((o) => o.godkjent);
+sjekk('godkjente oppgaver er med', godkjentIDag.every((o) => uke.data.godkjent.some((x) => x.id === o.id)), `${godkjentIDag.length} / ${uke.data.godkjent.length}`);
+sjekk('nye mangler er med', uke.data.mangler.nye.some((m) => m.id === m1.data.id), JSON.stringify(uke.data.mangler));
+sjekk('nye dokumenter er med', uke.data.dokumenter.some((x) => x.id === d1.data.id));
+sjekk('ingen interne felt om ansvarlig i oppgavene', uke.data.godkjent.every((o) => !('ansvarlig_id' in o) && !('merknad' in o)));
+const forrige = (await leder('GET', `/prosjekter/${p.id}/ukerapport?uke=${uke.data.forrige}`)).data;
+sjekk('forrige uke kan åpnes', forrige.mandag === uke.data.forrige && forrige.neste === uke.data.mandag && forrige.pagar === false);
+sjekk('uke frem i tid gir denne uken', (await leder('GET', `/prosjekter/${p.id}/ukerapport?uke=2099-01-05`)).data.mandag === uke.data.mandag);
+sjekk('ukjent prosjekt gir 404', (await leder('GET', '/prosjekter/999999/ukerapport')).status === 404);
+void iDagTest;
+
 console.log('Eksempelprosjekt:');
 sjekk('leverandør kan ikke lage eksempelprosjekt', (await lev2('POST', '/eksempelprosjekt')).status === 403);
 const eks = await leder('POST', '/eksempelprosjekt');
@@ -320,6 +405,10 @@ sjekk('eksempelet har oppgaver i alle statuser', eksFull.oppgaver.length === 16 
 sjekk('eksempelet har milepæler, mangler og spørsmål til kunden', eksFull.milepaeler.length === 5 && eksFull.mangler.length === 3 && eksFull.beslutninger.length === 1);
 sjekk('eksempelet er merket', eksFull.prosjekt.eksempel === true && (await leder('GET', '/prosjekter')).data.find((x) => x.id === eks.data.id)?.eksempel === true);
 sjekk('eksempelet har dagbok', (await leder('GET', `/prosjekter/${eks.data.id}/dagbok`)).data.length === 3);
+const eksDok = (await leder('GET', `/prosjekter/${eks.data.id}/dokumenter`)).data.dokumenter;
+sjekk('eksempelet har dokumenter', eksDok.length === 4 && eksDok.some((d) => d.kategori === 'samsvar'));
+const eksPdf = await fetch(`${BASE}/api/k/${eksFull.prosjekt.kunde_token}/fil/${eksDok.find((d) => d.synlig_for_kunde).vedlegg_id}`);
+sjekk('eksempeldokumentet er en PDF kunden kan åpne', eksPdf.status === 200 && (await eksPdf.text()).startsWith('%PDF-'));
 const eksOk = (await leder('GET', `/prosjekter/${eks.data.id}/okonomi`)).data;
 sjekk('eksempelet viser eksempeltall uten Tripletex-kobling', eksOk.miljo === 'eksempel' && eksOk.kostnader.bokfort > 0 && eksOk.timer.sum > 0 && eksOk.budsjett.kostnad === 350000);
 sjekk('kundesiden til eksempelet virker', (await kunde('GET', `/k/${eksFull.prosjekt.kunde_token}`)).status === 200);

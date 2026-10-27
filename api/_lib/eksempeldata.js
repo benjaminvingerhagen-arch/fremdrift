@@ -98,3 +98,64 @@ export function eksempelOkonomi() {
   const poster = eksempelPoster();
   return { poster, timer: eksempelTimer(), tilGodkjenning: eksempelTilGodkjenning(poster), merknader: [] };
 }
+
+// En enkel PDF med én side tekst, til eksempeldokumentene. Helvetica med WinAnsi-tegnsett,
+// så æ, ø og å kommer med.
+export function enkelPdf(tittel, linjer = []) {
+  const esc = (t) => String(t).replace(/[\\()]/g, (c) => `\\${c}`);
+  const tekst = [
+    'BT /F1 20 Tf 60 770 Td',
+    `(${esc(tittel)}) Tj`,
+    '/F1 11 Tf 0 -34 Td 15 TL',
+    ...linjer.map((l) => `(${esc(l)}) '`),
+    'ET',
+  ].join('\n');
+  const objekter = [
+    '<< /Type /Catalog /Pages 2 0 R >>',
+    '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
+    '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>',
+    '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>',
+    `<< /Length ${Buffer.byteLength(tekst, 'latin1')} >>\nstream\n${tekst}\nendstream`,
+  ];
+  let ut = '%PDF-1.4\n';
+  const steder = [];
+  objekter.forEach((o, i) => {
+    steder.push(Buffer.byteLength(ut, 'latin1'));
+    ut += `${i + 1} 0 obj\n${o}\nendobj\n`;
+  });
+  const xref = Buffer.byteLength(ut, 'latin1');
+  ut += `xref\n0 ${objekter.length + 1}\n0000000000 65535 f \n${steder.map((s) => `${String(s).padStart(10, '0')} 00000 n \n`).join('')}`;
+  ut += `trailer\n<< /Size ${objekter.length + 1} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF\n`;
+  return Buffer.from(ut, 'latin1');
+}
+
+export const EKSEMPEL_DOKUMENTER = [
+  {
+    tittel: 'Byggekontrakt (eksempel)',
+    kategori: 'kontrakt',
+    kunde: true,
+    fag: false,
+    linjer: ['Kontrakt om totalrenovering av enebolig, Eksempelveien 12.', 'Oppdiktet eksempel til demonstrasjon.', '', 'Kontraktssum: 1 250 000 kr inkl. mva.', 'Overtakelse: se fremdriftsplanen.'],
+  },
+  {
+    tittel: 'Plantegning 1. etasje, rev. B (eksempel)',
+    kategori: 'tegninger',
+    kunde: true,
+    fag: true,
+    linjer: ['Bad, kjøkken, stue og gang.', 'Revisjon B: flyttet vegg mellom bad og vaskerom 20 cm.', '', 'Oppdiktet eksempel til demonstrasjon.'],
+  },
+  {
+    tittel: 'SHA-plan (eksempel)',
+    kategori: 'hms',
+    kunde: false,
+    fag: true,
+    linjer: ['Sikkerhet, helse og arbeidsmiljø på byggeplassen.', 'Riggplan, rømningsveier og ansvarlige.', '', 'Oppdiktet eksempel til demonstrasjon.'],
+  },
+  {
+    tittel: 'Samsvarserklæring elektro (eksempel)',
+    kategori: 'samsvar',
+    kunde: false,
+    fag: false,
+    linjer: ['Erklæring om samsvar for den elektriske installasjonen.', 'Leveres av elektrikeren ved sluttkontroll.', '', 'Oppdiktet eksempel til demonstrasjon.'],
+  },
+];
