@@ -6,11 +6,18 @@ import { extname, join, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PGlite } from '@electric-sql/pglite';
 import { useDevDatabase } from '../api/_lib/db.js';
+import { tripletexFalsk, FALSK_API_NOKKEL } from './tripletex-falsk.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const port = Number(process.env.PORT) || 3000;
 process.env.REGISTRERINGSKODE ||= 'lokal';
 if (process.env.DATO) globalThis.__FREMDRIFT_DATO = process.env.DATO;
+// Uten ekte Tripletex-nøkler brukes en lokal etterligning, så økonomien kan prøves og testes.
+const falskTripletex = !process.env.TRIPLETEX_API_TOKEN && !process.env.TRIPLETEX_CONSUMER_TOKEN;
+if (falskTripletex) {
+  process.env.TRIPLETEX_URL = `http://localhost:${port}/__falsk-tripletex/v2`;
+  process.env.TRIPLETEX_API_TOKEN = FALSK_API_NOKKEL;
+}
 
 const db = new PGlite(join(root, '.dev-db'), {
   parsers: { 20: Number, 1700: Number, 1082: (v) => v },
@@ -94,7 +101,9 @@ createServer(async (req, res) => {
   vercelResponse(res);
   const url = new URL(req.url, `http://${req.headers.host}`);
   try {
-    if (url.pathname === '/api' || url.pathname.startsWith('/api/')) {
+    if (falskTripletex && url.pathname.startsWith('/__falsk-tripletex/v2/')) {
+      await tripletexFalsk(req, res, decodeURIComponent(url.pathname.slice('/__falsk-tripletex/v2'.length)), url, await readBody(req));
+    } else if (url.pathname === '/api' || url.pathname.startsWith('/api/')) {
       req.query = Object.fromEntries(url.searchParams);
       if (url.pathname.startsWith('/api/')) req.query.rute = url.pathname.slice(5);
       req.body = await readBody(req);
@@ -116,4 +125,5 @@ createServer(async (req, res) => {
 }).listen(port, () => {
   console.log(`Fremdrift:          http://localhost:${port}/`);
   console.log(`Registreringskode:  ${process.env.REGISTRERINGSKODE}`);
+  console.log(`Tripletex:          ${falskTripletex ? 'lokal etterligning (oppdiktede data)' : process.env.TRIPLETEX_URL || 'https://tripletex.no/v2'}`);
 });

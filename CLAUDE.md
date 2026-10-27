@@ -37,6 +37,8 @@ npm test                        # i et annet vindu, mot dev-serveren på tom dat
 - Databaseskjemaet ligger i `api/_lib/schema.js`. Ved endring: øk `VERSJON` og legg
   `ALTER TABLE ... ADD COLUMN IF NOT EXISTS` / nye `CREATE TABLE IF NOT EXISTS` nederst i
   `SCHEMA` (aldri endre eksisterende `CREATE TABLE`, da får ikke gamle databaser kolonnen).
+- Tripletex (`api/_lib/tripletex.js`, `routes/okonomi.js`) er bare lesing og bare for prosjektleder.
+  Lokalt brukes `scripts/tripletex-falsk.mjs` automatisk; nye kall mot Tripletex må etterlignes der.
 - Varsler i appen lages via `logg` med `type` (se `api/_lib/routes/varsler.js`). E-post går
   gjennom `api/_lib/epost.js` (Resend) og er valgfritt: alt skal virke uten `RESEND`.
 - `shared/plan.js` har reglene for status, sjekkpunkter og fremdrift. Brukes av både server og nettleser.
