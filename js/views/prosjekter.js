@@ -96,7 +96,7 @@ export async function nyttProsjekt() {
       </label>
       <div data-kundefag hidden></div>
       <div class="rad2">
-        <label class="felt"><span>Prosjektnavn</span><input type="text" name="navn" required placeholder="F.eks. Vavikbakken 24"></label>
+        <label class="felt"><span>Prosjektnavn</span><input type="text" name="navn" required placeholder="F.eks. Eksempelveien 12"></label>
         <label class="felt"><span>Adresse</span><input type="text" name="adresse"></label>
       </div>
       <div class="rad3">
