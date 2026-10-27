@@ -2,25 +2,382 @@
 <html lang="nb-NO">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Fremdrift</title>
-<meta name="description" content="Fremdrift – fremdriftsplan, oppgaver til fagene og egen prosjektside for kunden.">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fremdrift – fremdriftsplan for byggeprosjekter</title>
+<meta name="description" content="Fremdriftsplan, oppgaver til fagene og en egen prosjektside for kunden – for byggefirma og håndverkere. Ett system alle på prosjektet følger.">
+<!-- Ikke søkbar før navn og domene er bestemt. Se «Bytte navn» i README.md. -->
 <meta name="robots" content="noindex, nofollow">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#16212c">
+<meta property="og:title" content="Fremdrift – fremdriftsplan for byggeprosjekter">
+<meta property="og:description" content="Fremdriftsplan, oppgaver til fagene og egen prosjektside for kunden.">
+<meta property="og:locale" content="nb_NO">
 <link rel="icon" href="/logo/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/logo/ikon-180.png">
-<link rel="manifest" href="/api/manifest" crossorigin="use-credentials">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Fremdrift">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="preload" href="/fonter/schibsted-grotesk-variabel-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/fonter/fonter.css">
-<link rel="stylesheet" href="/stil.css?v=3">
+<link rel="stylesheet" href="/forside.css?v=1">
+<script src="/forside.js?v=1"></script>
 </head>
 <body>
-<div id="app"><div class="loading">Laster …</div></div>
-<noscript><p style="padding:24px;font-family:sans-serif">Fremdrift krever JavaScript.</p></noscript>
-<script type="module" src="/js/app.js?v=2"></script>
+
+<a class="hopp" href="#innhold">Hopp til innholdet</a>
+
+<header class="topp" id="topp">
+  <div class="rad">
+    <a href="/" class="logo" aria-label="Fremdrift – til forsiden">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="currentColor"/><g stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M8 22.5h16"/><path d="M8 16.5h9" opacity=".75"/><path d="M8 10.5h4.5" opacity=".5"/></g><circle cx="22.5" cy="10.5" r="2.6" fill="#f08a4b"/></svg>
+      <span>Fremdrift</span>
+    </a>
+    <nav class="hovednav" aria-label="Hovedmeny">
+      <a href="#se-selv">Se selv</a>
+      <a href="#funksjoner">Funksjoner</a>
+      <a href="#sikkerhet">Sikkerhet</a>
+      <a href="#priser">Priser</a>
+    </nav>
+    <div class="topp-knapper">
+      <a href="/app" class="lenke-logginn">Logg inn</a>
+      <a href="#demo" class="knapp liten">Be om demo</a>
+    </div>
+  </div>
+</header>
+
+<main id="innhold">
+
+  <!-- Hovedbudskap -->
+  <section class="helt">
+    <div class="rad helt-rad">
+      <div class="helt-tekst">
+        <p class="merke">For byggefirma og håndverkere</p>
+        <h1>Hele prosjektet. <em>Én plan</em> alle følger.</h1>
+        <p class="ingress">Fremdriftsplan, oppgaver til fagene og en egen prosjektside for kunden – oppdatert i det øyeblikket noe blir ferdig. Prosjektlederen planlegger, fagene ser sitt på telefonen, og kunden slipper å ringe for å høre hvordan det går.</p>
+        <div class="knapper">
+          <a href="#demo" class="knapp">Be om demo</a>
+          <a href="#se-selv" class="knapp sekundar">Se hvordan det virker</a>
+        </div>
+        <p class="smaa">Fagene og kunden trenger verken app eller passord – de får en lenke.</p>
+      </div>
+
+      <div class="helt-bilde" aria-hidden="true">
+        <div class="skjerm">
+          <div class="skjerm-topp"><span></span><span></span><span></span><b>Vavikbakken 24 · Fremdriftsplan</b></div>
+          <div class="skjerm-innhold">
+            <div class="tall-rad">
+              <div class="tall"><small>Godkjent</small><strong>62 %</strong></div>
+              <div class="tall info"><small>Til kontroll</small><strong>3</strong></div>
+              <div class="tall"><small>Innflytting</small><strong>13.11</strong></div>
+            </div>
+            <div class="gantt">
+              <div class="gantt-uker"><span></span><b>Uke 44</b><b>Uke 45</b><b>Uke 46</b></div>
+              <div class="gantt-rad"><span>Riving</span><div class="spor"><i class="bar ferdig" style="--fra:0;--til:14"></i></div></div>
+              <div class="gantt-rad"><span>Tømrer</span><div class="spor"><i class="bar ferdig" style="--fra:8;--til:40"></i></div></div>
+              <div class="gantt-rad"><span>Elektro</span><div class="spor"><i class="bar pagar" style="--fra:30;--til:58"></i></div></div>
+              <div class="gantt-rad"><span>Rørlegger</span><div class="spor"><i class="bar meldt" style="--fra:34;--til:52"></i></div></div>
+              <div class="gantt-rad"><span>Maler</span><div class="spor"><i class="bar" style="--fra:56;--til:82"></i></div></div>
+              <div class="gantt-rad"><span>Gulv</span><div class="spor"><i class="bar" style="--fra:74;--til:94"></i><i class="milepael" style="--fra:96"></i></div></div>
+              <div class="i-dag" style="--fra:44"><small>I dag</small></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Kjenner du deg igjen -->
+  <section class="seksjon kjenner">
+    <div class="rad">
+      <h2>Kjenner du deg igjen?</h2>
+      <div class="kort-grid fire">
+        <div class="kort"><p class="sitat">«Når kommer elektrikeren egentlig?»</p></div>
+        <div class="kort"><p class="sitat">«Planen ligger i Excel på kontoret. Folka på plassen har en annen versjon.»</p></div>
+        <div class="kort"><p class="sitat">«Maleren sa han var ferdig. Det var han ikke.»</p></div>
+        <div class="kort"><p class="sitat">«Kunden ringer for tredje gang denne uken for å høre hvordan det går.»</p></div>
+      </div>
+      <p class="kjenner-svar">Fremdrift gir alle den samme planen – og kunden sin egen side.</p>
+    </div>
+  </section>
+
+  <!-- Se selv -->
+  <section class="seksjon" id="se-selv">
+    <div class="rad">
+      <p class="merke">Se selv</p>
+      <h2>Ett bad. Tre skjermer.</h2>
+      <p class="seksjon-ingress">Følg elektroarbeidet på badet i Vavikbakken 24 fra planen er lagt til kunden ser at det er ferdig.</p>
+
+      <div class="demo">
+        <div class="demo-faner" role="tablist" aria-label="Velg skjerm">
+          <button role="tab" id="fane-leder" aria-controls="panel-leder" aria-selected="true">
+            <span class="steg">1</span><span><b>Prosjektlederen</b><small>Planlegger og godkjenner</small></span>
+          </button>
+          <button role="tab" id="fane-fag" aria-controls="panel-fag" aria-selected="false" tabindex="-1">
+            <span class="steg">2</span><span><b>Elektrikeren</b><small>Ser sitt og melder ferdig</small></span>
+          </button>
+          <button role="tab" id="fane-kunde" aria-controls="panel-kunde" aria-selected="false" tabindex="-1">
+            <span class="steg">3</span><span><b>Kunden</b><small>Følger med og svarer</small></span>
+          </button>
+        </div>
+
+        <div class="demo-paneler">
+          <div class="demo-panel" role="tabpanel" id="panel-leder" aria-labelledby="fane-leder">
+            <div class="demo-tekst">
+              <h3>Prosjektlederen legger planen og kontrollerer arbeidet</h3>
+              <p>Importer fremdriftsplanen fra Excel eller bygg den i Gantt-visningen. Oppgavene fordeles etter fag, så elektrikeren får alle elektro-oppgaver i alle prosjekter – uten at du sender noe.</p>
+              <p>Når faget melder ferdig, havner oppgaven til kontroll. Du godkjenner, eller sender den tilbake med beskjed om hva som mangler. Først da teller den som ferdig.</p>
+            </div>
+            <div class="skjerm liten-skjerm" aria-hidden="true">
+              <div class="skjerm-topp"><span></span><span></span><span></span><b>Til kontroll</b></div>
+              <div class="skjerm-innhold">
+                <div class="liste">
+                  <div class="liste-tittel">Meldt ferdig</div>
+                  <div class="linje"><span class="fag" style="--hue:200"></span><span>Montering bad – stikk og lys</span><span class="knapp-falsk mini ok">Godkjenn</span></div>
+                  <div class="linje"><span class="fag" style="--hue:30"></span><span>Rør til vaskemaskin</span><span class="knapp-falsk mini ok">Godkjenn</span></div>
+                  <div class="linje"><span class="fag" style="--hue:280"></span><span>Sparkling gang</span><span class="knapp-falsk mini lys">Send tilbake</span></div>
+                </div>
+                <div class="sjekkpunkt"><b>Fredag · Ferdigkontroll uke 45</b><span>Godkjenn ferdige oppgaver, noter avvik og tiltak</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="demo-panel" role="tabpanel" id="panel-fag" aria-labelledby="fane-fag" hidden>
+            <div class="demo-tekst">
+              <h3>Elektrikeren har oppgavene sine på telefonen</h3>
+              <p>Ansatte og leverandører får en personlig lenke – ingen app å installere og ikke noe passord. De ser bare sine egne oppgaver, i alle prosjekter, med det som haster øverst.</p>
+              <p>Ferdig? Ett trykk, gjerne med et bilde. Oppgavene kan også legges rett inn i kalenderen på telefonen.</p>
+            </div>
+            <div class="telefon" aria-hidden="true">
+              <div class="telefon-topp"><b>Hei, Ola</b><small>tirsdag 3. nov. · Elektro</small></div>
+              <div class="telefon-innhold">
+                <div class="mkort">
+                  <div class="mkort-topp"><b>Montering bad</b><span class="status aktiv">Pågår</span></div>
+                  <small>Vavikbakken 24 · frist fredag 6. nov.</small>
+                  <div class="knapp-falsk ok">✓ Meld ferdig</div>
+                </div>
+                <div class="mkort">
+                  <div class="mkort-topp"><b>Trekk kabler 2. etg.</b><span class="status">Starter snart</span></div>
+                  <small>Lia, Tveit · 9.–11. nov.</small>
+                </div>
+                <div class="kalenderlinje">▦ Oppgavene i kalenderen din</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="demo-panel" role="tabpanel" id="panel-kunde" aria-labelledby="fane-kunde" hidden>
+            <div class="demo-tekst">
+              <h3>Kunden ser fremdriften – og bare det</h3>
+              <p>Kunden får en egen prosjektside med fremdrift, ukens arbeid, milepæler og bilder fra byggeplassen. Det interne blir igjen hos deg: kunden ser aldri «forsinket», merknader eller hvem som har ansvaret.</p>
+              <p>Spørsmål som må avklares – farge på fuger, valg av fliser – besvares på siden, med frist. Svaret havner som varsel hos prosjektlederen.</p>
+            </div>
+            <div class="skjerm liten-skjerm" aria-hidden="true">
+              <div class="skjerm-topp"><span></span><span></span><span></span><b>Prosjektside for familien Lia</b></div>
+              <div class="skjerm-innhold">
+                <div class="kunde-topp"><div class="ring" style="--pst:62"><b>62 %</b></div><div><b>Vavikbakken 24</b><small>Innflytting om 10 dager</small></div></div>
+                <div class="sporsmal"><b>Vi trenger svar fra deg</b><span>Farge på fuger på badet · svar innen fredag</span><div class="valg"><i>Lys grå</i><i>Mørk grå</i><i>Hvit</i></div></div>
+                <div class="liste">
+                  <div class="liste-tittel">Dette skjer denne uken</div>
+                  <div class="linje"><span class="hake ja"></span><span>Elektro – bad</span><span class="status gronn">Ferdig</span></div>
+                  <div class="linje"><span class="hake"></span><span>Maler – stue og gang</span><span class="status aktiv">Pågår</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Funksjoner -->
+  <section class="seksjon mork" id="funksjoner">
+    <div class="rad">
+      <p class="merke">Funksjoner</p>
+      <h2>Alt som skal til for å holde fremdriften.</h2>
+      <div class="kort-grid tre">
+        <article class="kort funksjon">
+          <span class="fikon">▤</span>
+          <h3>Fremdriftsplan</h3>
+          <p>Gantt-plan per fag med milepæler, innflytting og sluttfrist. Importer planen fra Excel, og forskyv åpne oppgaver et antall arbeidsdager når noe skjer.</p>
+        </article>
+        <article class="kort funksjon">
+          <span class="fikon">⚒</span>
+          <h3>Oppgaver til fagene</h3>
+          <p>Oppgavene går automatisk til den som har faget, eller til en bestemt person. Meldinger og bilder på hver oppgave, rett fra byggeplassen.</p>
+        </article>
+        <article class="kort funksjon">
+          <span class="fikon">✓</span>
+          <h3>Godkjenning</h3>
+          <p>Faget melder ferdig, prosjektlederen godkjenner eller sender tilbake med beskjed. Prosenten på forsiden og hos kunden teller bare det som er godkjent.</p>
+        </article>
+        <article class="kort funksjon">
+          <span class="fikon">◷</span>
+          <h3>Sjekkpunkter</h3>
+          <p>Oppstart hver mandag og ferdigkontroll hver fredag, med frister, oppstarter og milepæler for uken – og plass til avvik og tiltak.</p>
+        </article>
+        <article class="kort funksjon">
+          <span class="fikon">◉</span>
+          <h3>Prosjektside for kunden</h3>
+          <p>Fremdrift, ukens arbeid, tidslinje, oppdateringer med bilder og spørsmål kunden svarer på. Kunden kan også flytte leveranser hen styrer selv, som kjøkken.</p>
+        </article>
+        <article class="kort funksjon">
+          <span class="fikon">⚑</span>
+          <h3>Mangler og dagbok</h3>
+          <p>Mangelliste ved overtakelse med bilde, frist og ansvarlig fag. Dagbok med vær, bemanning, avvik og bilder – god dokumentasjon hvis det blir uenighet.</p>
+        </article>
+      </div>
+
+      <div class="og-resten">
+        <h3>Og resten</h3>
+        <ul>
+          <li>Varsler når noe meldes ferdig, fagene skriver eller kunden svarer</li>
+          <li>E-postvarsler til prosjektleder, fag og kunde</li>
+          <li>Kalenderabonnement for ansatte og leverandører</li>
+          <li>App på hjemskjermen – for iPhone og Android</li>
+          <li>Del bilder fra fagene rett til kundesiden</li>
+          <li>Leveranser kunden styrer selv, med egne datoer</li>
+          <li>Logg over hvem som endret hva</li>
+          <li>Flere prosjekter i gang samtidig, med fremdrift i menyen</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Roller -->
+  <section class="seksjon">
+    <div class="rad">
+      <p class="merke">Roller</p>
+      <h2>Alle jobber i den samme planen. Hver ser sitt.</h2>
+      <div class="kort-grid tre">
+        <article class="kort rolle">
+          <h3>Prosjektlederen</h3>
+          <p>Ser alle prosjektene, legger planen, fordeler oppgavene, godkjenner arbeidet og bestemmer hva kunden får se.</p>
+        </article>
+        <article class="kort rolle">
+          <h3>Ansatte og leverandører</h3>
+          <p>Ser sine egne oppgaver i alle prosjekter, melder ferdig, sender bilder og skriver til prosjektlederen. Med en personlig lenke – uten passord.</p>
+        </article>
+        <article class="kort rolle">
+          <h3>Kunden</h3>
+          <p>Følger fremdriften på sin egen prosjektside, ser bilder fra byggeplassen og svarer på spørsmål – uten å måtte logge inn.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sikkerhet -->
+  <section class="seksjon lys" id="sikkerhet">
+    <div class="rad sikkerhet-rad">
+      <div>
+        <p class="merke">Sikkerhet</p>
+        <h2>Hver ser sitt. Ingen ser for mye.</h2>
+        <p class="seksjon-ingress">Et byggeprosjekt har mange parter. Fremdrift skiller strengt mellom hva prosjektlederen, fagene og kunden får se – og det er serveren som bestemmer, ikke bare skjermen.</p>
+      </div>
+      <ul class="sikkerhet-liste">
+        <li><b>Fagene ser bare sitt</b><span>En leverandør får bare oppgaver, meldinger og bilder i eget fag eller der hen står som ansvarlig.</span></li>
+        <li><b>Kunden ser det som er ment for kunden</b><span>Aldri «forsinket», interne merknader, logg eller hvem som er ansvarlig. Bilder vises bare når de er publisert.</span></li>
+        <li><b>Lenker som kan byttes</b><span>Personlige lenker og kundelenker kan byttes når som helst. Den gamle slutter å virke med en gang.</span></li>
+        <li><b>Trygt lagret</b><span>Passord lagres med scrypt, og personlige lenker og innlogginger bare som hash.</span></li>
+        <li><b>Stengt for gjetting</b><span>For mange feil forsøk på innlogging eller lenker stenges i et kvarter.</span></li>
+        <li><b>Ingen sporing</b><span>Ingen annonser eller eksterne skript. Skriftene ligger på vår egen server.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Priser -->
+  <section class="seksjon" id="priser">
+    <div class="rad">
+      <p class="merke">Priser</p>
+      <h2>Betal for prosjektlederne. Resten er med.</h2>
+      <p class="seksjon-ingress">Alle funksjonene er med i alle planer. Ansatte, leverandører og kunder koster ingenting – uansett hvor mange de er.</p>
+      <div class="pris-grid">
+        <article class="pris-kort">
+          <h3>Start</h3>
+          <p class="pris-for">Én prosjektleder</p>
+          <p class="pris"><strong>490 kr</strong><span>per måned</span></p>
+          <ul>
+            <li>Alle funksjoner</li>
+            <li>Ubegrenset antall prosjekter</li>
+            <li>Fag og kunder er gratis</li>
+            <li>Hjelp på e-post</li>
+          </ul>
+          <a href="#demo" class="knapp sekundar bred">Be om demo</a>
+        </article>
+        <article class="pris-kort fremhevet">
+          <p class="pris-merke">Mest valgt</p>
+          <h3>Firma</h3>
+          <p class="pris-for">2–5 prosjektledere</p>
+          <p class="pris"><strong>390 kr</strong><span>per prosjektleder / mnd</span></p>
+          <ul>
+            <li>Alt i Start</li>
+            <li>Flere prosjektledere på de samme prosjektene</li>
+            <li>Hjelp med å importere planene fra Excel</li>
+            <li>Hjelp på e-post og telefon</li>
+          </ul>
+          <a href="#demo" class="knapp bred">Be om demo</a>
+        </article>
+        <article class="pris-kort">
+          <h3>Stort firma</h3>
+          <p class="pris-for">6 prosjektledere eller flere</p>
+          <p class="pris"><strong>Etter avtale</strong><span>&nbsp;</span></p>
+          <ul>
+            <li>Alt i Firma</li>
+            <li>Hjelp med oppsett og import</li>
+            <li>Fast kontaktperson</li>
+          </ul>
+          <a href="#demo" class="knapp sekundar bred">Ta kontakt</a>
+        </article>
+      </div>
+      <p class="smaa sentrert">Prisene er eks. mva. Månedlig betaling, ingen binding.</p>
+    </div>
+  </section>
+
+  <!-- Be om demo -->
+  <section class="seksjon prov" id="demo">
+    <div class="rad prov-rad">
+      <div>
+        <h2>Vil du styre prosjektene slik?</h2>
+        <p class="seksjon-ingress">Fortell litt om firmaet, så tar vi kontakt og viser deg Fremdrift med et av dine egne prosjekter. Har du fremdriftsplanen i Excel, kan vi importere den med en gang.</p>
+        <ol class="prov-liste">
+          <li><b>Si fra</b> – fyll ut skjemaet.</li>
+          <li><b>Se det med egne prosjekter</b> – vi viser deg systemet med planen din.</li>
+          <li><b>Kom i gang</b> – legg inn fagene og send kunden lenken.</li>
+        </ol>
+      </div>
+      <form class="prov-steg demo-skjema" id="demo-skjema" novalidate>
+        <div class="to">
+          <label><span>Navn</span><input name="navn" required maxlength="100" autocomplete="name"></label>
+          <label><span>Firma</span><input name="firma" required maxlength="120" autocomplete="organization"></label>
+        </div>
+        <div class="to">
+          <label><span>E-post</span><input name="epost" type="email" required maxlength="160" autocomplete="email"></label>
+          <label><span>Telefon <small>(valgfritt)</small></span><input name="telefon" type="tel" maxlength="30" autocomplete="tel"></label>
+        </div>
+        <label><span>Hva lurer du på? <small>(valgfritt)</small></span><textarea name="tekst" rows="3" maxlength="2000" placeholder="F.eks. hvor mange prosjekter dere har i gang, og hvordan dere planlegger i dag"></textarea></label>
+        <label class="honning" aria-hidden="true"><span>Nettside</span><input name="nettside" tabindex="-1" autocomplete="off"></label>
+        <p class="skjema-melding" role="status" aria-live="polite"></p>
+        <div class="knapper">
+          <button class="knapp" type="submit">Be om demo</button>
+          <a href="/app" class="knapp sekundar">Logg inn</a>
+        </div>
+      </form>
+    </div>
+  </section>
+
+</main>
+
+<footer class="bunn">
+  <div class="rad bunn-rad">
+    <a href="/" class="logo" aria-label="Fremdrift – til forsiden">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="currentColor"/><g stroke="#16212c" stroke-width="2.4" stroke-linecap="round"><path d="M8 22.5h16"/><path d="M8 16.5h9" opacity=".75"/><path d="M8 10.5h4.5" opacity=".5"/></g><circle cx="22.5" cy="10.5" r="2.6" fill="#f08a4b"/></svg>
+      <span>Fremdrift</span>
+    </a>
+    <nav aria-label="Bunnmeny">
+      <a href="#funksjoner">Funksjoner</a>
+      <a href="#sikkerhet">Sikkerhet</a>
+      <a href="#priser">Priser</a>
+      <a href="#demo">Be om demo</a>
+      <a href="/app">Logg inn</a>
+    </nav>
+    <p class="smaa">© <span id="aar">2026</span> Fremdrift</p>
+  </div>
+</footer>
+
 </body>
 </html>

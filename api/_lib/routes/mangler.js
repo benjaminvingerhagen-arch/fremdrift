@@ -182,7 +182,7 @@ route(
         unntatt: user.id,
         emne: `Mangel utbedret: ${m.tittel} (${p.navn})`,
         tekst: `${user.navn}${user.firma ? ` (${user.firma})` : ''} har meldt mangelen «${m.tittel}» utbedret i ${p.navn}.${kommentar ? `\n\n«${kommentar}»` : ''}\nKontroller og godkjenn, eller send den tilbake.`,
-        sti: `/#/p/${m.prosjekt_id}/mangler`,
+        sti: `/app#/p/${m.prosjekt_id}/mangler`,
       });
     }
     return rad;

@@ -133,7 +133,7 @@ route(
     await varsleLedere(req, {
       emne: `Kunden har svart: ${b.sporsmal} (${p.navn})`,
       tekst: `${p.kunde_navn || 'Kunden'} har svart på «${b.sporsmal}»:\n\n${svar}${rad.svar_kommentar ? `\n«${rad.svar_kommentar}»` : ''}`,
-      sti: `/#/p/${p.id}/kunde`,
+      sti: `/app#/p/${p.id}/kunde`,
     });
     return rad;
   },
@@ -174,7 +174,7 @@ route(
       await varsleLedere(req, {
         emne: `Kunden har oppdatert ${o.tittel} (${p.navn})`,
         tekst: `${p.kunde_navn || 'Kunden'} har oppdatert «${o.tittel}»:\n\n${endringer.join('\n')}`,
-        sti: `/#/p/${p.id}/plan`,
+        sti: `/app#/p/${p.id}/plan`,
       });
     }
     return { id: rad.id, fra: rad.fra, til: rad.til, levert: Boolean(rad.ferdig_meldt) };

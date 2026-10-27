@@ -99,6 +99,11 @@ createServer(async (req, res) => {
       if (url.pathname.startsWith('/api/')) req.query.rute = url.pathname.slice(5);
       req.body = await readBody(req);
       await apiHandler(req, res);
+    } else if ((vercel.redirects || []).some((r) => r.source === url.pathname)) {
+      const r = vercel.redirects.find((x) => x.source === url.pathname);
+      res.statusCode = r.permanent ? 308 : 307;
+      res.setHeader('Location', r.destination);
+      res.end();
     } else if (/^\/k\/[^/]+$/.test(url.pathname)) {
       await serveStatic('/kunde.html', res);
     } else {

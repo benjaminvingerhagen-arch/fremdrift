@@ -1,11 +1,12 @@
 import { api } from '../api.js';
 import { html, icon, $, $$, modal, attempt, formData, avatar, bekreft, kopier, toast } from '../ui.js';
 import { store, fagHue } from '../store.js';
+import { NAVN } from '/shared/merke.js';
 
 const ROLLE = { leder: 'Prosjektleder', ansatt: 'Ansatt', leverandor: 'Leverandør' };
 
 export async function personerView(el) {
-  document.title = 'Folk og leverandører · Fremdrift';
+  document.title = `Folk og leverandører · ${NAVN}`;
   const folk = await api.get('/personer');
   const grupper = [
     ['Leverandører og underentreprenører', folk.filter((p) => p.rolle === 'leverandor')],
@@ -14,7 +15,7 @@ export async function personerView(el) {
   ];
   el.innerHTML = html`
     <div class="topp">
-      <div class="tittel"><div class="over">${store.firma || 'Fremdrift'}</div><h1>Folk og leverandører</h1>
+      <div class="tittel"><div class="over">${store.firma || NAVN}</div><h1>Folk og leverandører</h1>
         <div class="under"><span>Hver person får en personlig lenke til sine oppgaver – ingen passord å huske.</span></div></div>
       <button class="knapp primar" data-ny>${icon('plus')} Legg til person</button>
     </div>

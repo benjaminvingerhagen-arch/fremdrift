@@ -2,6 +2,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { q } from './db.js';
+import { NAVN } from '../../shared/merke.js';
 
 // Utgående e-post via Resend. Uten RESEND og MAIL_FROM sendes ingenting i drift –
 // varslene i appen virker uansett. Lokalt legges meldingene i .dev-db/epost.json,
@@ -24,17 +25,17 @@ async function lagreLokalt(melding) {
   }
 }
 
-async function send(to, subject, text) {
+async function send(to, subject, text, { svarTil = null } = {}) {
   if (!to) return false;
   if (!resendKlar()) {
-    if (!iDrift()) await lagreLokalt({ to, subject, text });
+    if (!iDrift()) await lagreLokalt({ to, subject, text, svarTil });
     return false;
   }
   // Et varsel skal aldri få en handling til å feile eller henge: kort tidsavbrudd, feil logges.
   const svar = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { Authorization: `Bearer ${(process.env.RESEND || '').trim()}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ from: process.env.MAIL_FROM, to, subject, text }),
+    body: JSON.stringify({ from: process.env.MAIL_FROM, to, subject, text, ...(svarTil ? { reply_to: svarTil } : {}) }),
     signal: AbortSignal.timeout(5000),
   }).catch((err) => {
     console.error('E-post kunne ikke sendes', err);
@@ -43,6 +44,8 @@ async function send(to, subject, text) {
   if (svar && !svar.ok) console.error('E-post ble avvist', svar.status);
   return Boolean(svar?.ok);
 }
+
+export const sendEpost = send;
 
 // Adressen lenker i e-post peker til. Leses fra miljøet, aldri fra Host-headeren,
 // som kan settes av den som spør.
@@ -54,7 +57,7 @@ export function nettsted(req) {
   return `http://${req?.headers?.host || 'localhost:3000'}`;
 }
 
-const signatur = (firma) => `\n\n–\nSendt fra Fremdrift${firma ? ` for ${firma}` : ''}. Du får denne e-posten fordi du er med i prosjektet.`;
+const signatur = (firma) => `\n\n–\nSendt fra ${NAVN}${firma ? ` for ${firma}` : ''}. Du får denne e-posten fordi du er med i prosjektet.`;
 
 async function firma() {
   const r = await q(`SELECT verdi FROM innstillinger WHERE nokkel = 'firmanavn'`).catch(() => []);
@@ -62,7 +65,7 @@ async function firma() {
 }
 
 // Alle prosjektledere som vil ha varsler, unntatt den som selv gjorde handlingen.
-export async function varsleLedere(req, { unntatt = null, emne, tekst, sti = '/' }) {
+export async function varsleLedere(req, { unntatt = null, emne, tekst, sti = '/app' }) {
   const ledere = await q(
     `SELECT epost FROM brukere WHERE rolle = 'leder' AND aktiv AND epostvarsel AND epost IS NOT NULL AND id IS DISTINCT FROM $1`,
     [unntatt],

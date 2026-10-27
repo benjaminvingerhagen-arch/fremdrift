@@ -7,6 +7,7 @@ import { lagKalender } from '../ics.js';
 import { iDag, leggTilDager, PRIORITET_TEKST } from '../../../shared/plan.js';
 import { MINE } from './oppgaver.js';
 import { firmanavn } from './grunn.js';
+import { NAVN } from '../../../shared/merke.js';
 
 // Kalenderabonnement for ansatte og leverandører: en hemmelig adresse som kalenderen
 // på telefonen henter fra av seg selv. Kalenderapper kan ikke logge inn, så nøkkelen
@@ -124,10 +125,10 @@ route(
           [prosjektIder, fraDato],
         )
       : [];
-    const app = `${nettsted(req)}/#/mine`;
+    const app = `${nettsted(req)}/app#/mine`;
     const firma = await firmanavn();
     const ics = lagKalender({
-      navn: firma ? `Oppgaver hos ${firma}` : 'Mine oppgaver – Fremdrift',
+      navn: firma ? `Oppgaver hos ${firma}` : `Mine oppgaver – ${NAVN}`,
       hendelser: [
         ...oppgaver.map((o) => oppgaveHendelse(o, app)),
         ...milepaeler.map((m) => ({

@@ -4,11 +4,12 @@ import { store, lastProsjekter, fagHue } from '../store.js';
 import { lesFremdriftsplan } from '../regneark.js';
 import { iDag, dagerMellom, datoMedDag, ddmm } from '/shared/plan.js';
 import { tegnMeny } from '../app.js';
+import { NAVN } from '/shared/merke.js';
 
 export async function prosjekterView(el) {
   await lastProsjekter();
   tegnMeny();
-  document.title = 'Prosjekter · Fremdrift';
+  document.title = `Prosjekter · ${NAVN}`;
   const dag = iDag();
   const aktive = store.prosjekter.filter((p) => !p.arkivert);
   const arkiv = store.prosjekter.filter((p) => p.arkivert);
@@ -18,7 +19,7 @@ export async function prosjekterView(el) {
   el.innerHTML = html`
     <div class="topp">
       <div class="tittel">
-        <div class="over">${store.firma || 'Fremdrift'}</div>
+        <div class="over">${store.firma || NAVN}</div>
         <h1>God ${hilsen()}, ${store.me.navn.split(' ')[0]}</h1>
         <div class="under">
           <span>${icon('calendar')} ${datoMedDag(dag)}</span>

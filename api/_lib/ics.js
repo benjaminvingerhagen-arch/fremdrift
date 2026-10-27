@@ -1,3 +1,5 @@
+import { NAVN } from '../../shared/merke.js';
+
 // Kalenderfil (iCalendar, RFC 5545) som telefonens kalender kan abonnere på.
 // Bare heldagshendelser: oppgavene i planen har datoer, ikke klokkeslett.
 
@@ -46,7 +48,7 @@ export function lagKalender({ navn, hendelser }) {
   const linjer = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//Fremdrift//Kalender//NB',
+    `PRODID:-//${NAVN}//Kalender//NB`,
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
     `X-WR-CALNAME:${tekst(navn)}`,

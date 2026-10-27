@@ -67,7 +67,7 @@ sjekk('til-dato før fra-dato avvises', (await leder('PUT', `/oppgaver/${oEl.id}
 console.log('Leverandør:');
 const lev = klient();
 const inn = await lev('GET', `/inn/${el.nokkel}`);
-sjekk('lenken logger inn og sender til «mine»', inn.status === 302 && inn.headers.get('location') === '/#/mine');
+sjekk('lenken logger inn og sender til «mine»', inn.status === 302 && inn.headers.get('location') === '/app#/mine');
 const mine = (await lev('GET', '/mine')).data;
 sjekk('ser egne oppgaver i begge prosjekter', mine.oppgaver.length === 2 && mine.oppgaver.every((o) => o.fag === 'Elektro'), JSON.stringify(mine.oppgaver.map((o) => o.tittel)));
 sjekk('ser ikke prosjektlederens prosjektliste', (await lev('GET', '/prosjekter')).status === 403);
@@ -120,9 +120,9 @@ sjekk('gammel kundelenke slutter å virke', (await kunde('GET', `/k/${p.kunde_to
 console.log('Personer:');
 const nyLev = (await leder('POST', `/personer/${el.id}/lenke`)).data;
 sjekk('ny lenke logger ut den gamle økten', (await lev('GET', '/mine')).status === 401);
-sjekk('gammel lenke virker ikke', (await klient()('GET', `/inn/${el.nokkel}`)).headers.get('location') === '/#/ugyldig-lenke');
+sjekk('gammel lenke virker ikke', (await klient()('GET', `/inn/${el.nokkel}`)).headers.get('location') === '/app#/ugyldig-lenke');
 const lev2 = klient();
-sjekk('ny lenke virker', (await lev2('GET', `/inn/${nyLev.nokkel}`)).headers.get('location') === '/#/mine');
+sjekk('ny lenke virker', (await lev2('GET', `/inn/${nyLev.nokkel}`)).headers.get('location') === '/app#/mine');
 
 console.log('Varsler og uleste meldinger:');
 const v1 = (await leder('GET', '/varsler')).data;
@@ -233,16 +233,47 @@ sjekk('kunden får bildet fra den delte dagen', (await fetch(`${BASE}/api/k/${ny
 sjekk('samme dag kan ikke deles to ganger', (await leder('POST', `/prosjekter/${p.id}/dagbok/2026-11-03/del`, {})).status === 400);
 sjekk('dagboksiden kan slettes', (await leder('DELETE', `/prosjekter/${p.id}/dagbok/2026-11-03`)).status === 200 && (await leder('GET', `/prosjekter/${p.id}/dagbok`)).data.length === 0);
 
+console.log('Forside og app:');
+const forside = await fetch(`${BASE}/`).then(async (r) => ({ status: r.status, tekst: await r.text() }));
+sjekk('forsiden ligger på /', forside.status === 200 && forside.tekst.includes('id="demo-skjema"'));
+const appSide = await fetch(`${BASE}/app`).then(async (r) => ({ status: r.status, tekst: await r.text() }));
+sjekk('appen ligger på /app', appSide.status === 200 && appSide.tekst.includes('/js/app.js'));
+sjekk('forsiden sender gamle #/-lenker videre til appen', (await fetch(`${BASE}/forside.js`).then((r) => r.text())).includes('location.replace(`/app${location.hash}`)'));
+
+console.log('Be om demo:');
+const besok = klient();
+sjekk('demo uten e-post avvises', (await besok('POST', '/demo', { navn: 'Kari', firma: 'Bygg AS' })).status === 400);
+sjekk('demo uten egen header avvises', (await besok('POST', '/demo', { navn: 'Kari', firma: 'Bygg AS', epost: 'kari@bygg.no' }, { 'X-FD': '0' })).status === 403);
+sjekk('demo lagres', (await besok('POST', '/demo', { navn: 'Kari Nordmann', firma: 'Bygg AS', epost: 'kari@bygg.no', tekst: 'Vi har 6 prosjekter.' })).data?.ok === true);
+await besok('POST', '/demo', { navn: 'Robot', firma: 'Spam', epost: 'spam@spam.no', nettside: 'http://spam' });
+for (let i = 0; i < 4; i++) await besok('POST', '/demo', { navn: `Test ${i}`, firma: 'Bygg AS', epost: 'kari@bygg.no' });
+sjekk('for mange demoforespørsler fra samme avsender stoppes', (await besok('POST', '/demo', { navn: 'Igjen', firma: 'Bygg AS', epost: 'kari@bygg.no' })).status === 429);
+
+console.log('Meld feil:');
+sjekk('uten innlogging kan man ikke melde feil', (await klient()('POST', '/feilmelding', { tekst: 'Det virker ikke' })).status === 401);
+sjekk('for kort feilmelding avvises', (await leder('POST', '/feilmelding', { tekst: 'hm' })).status === 400);
+sjekk('prosjektleder melder feil', (await leder('POST', '/feilmelding', { tekst: 'Gantt hopper når jeg drar', side: '#/p/1/plan', nettleser: 'Test' })).data?.ok === true);
+sjekk('leverandør melder feil', (await lev2('POST', '/feilmelding', { tekst: 'Bildet lastet ikke opp', side: 'https://ondsinnet.no' })).data?.ok === true);
+const henv = (await leder('GET', '/henvendelser')).data;
+sjekk('prosjektleder ser henvendelsene', henv.rader.filter((r) => r.type === 'demo').length === 5 && henv.rader.filter((r) => r.type === 'feil').length === 2, JSON.stringify(henv.rader.map((r) => r.type)));
+sjekk('roboten ble ikke lagret', !henv.rader.some((r) => r.navn === 'Robot'));
+sjekk('feilmeldingen har med hvem og hvor', henv.rader.some((r) => r.type === 'feil' && r.navn === 'Prosjektleder' && r.side === '#/p/1/plan'));
+sjekk('fremmed adresse lagres ikke som side', henv.rader.some((r) => r.tekst === 'Bildet lastet ikke opp' && r.side === null));
+sjekk('IP-adressen sendes ikke til nettleseren', !JSON.stringify(henv).includes('ip_hash'));
+sjekk('leverandør ser ikke henvendelsene', (await lev2('GET', '/henvendelser')).status === 403);
+const forste = henv.rader[0];
+sjekk('henvendelse merkes som behandlet', Boolean((await leder('POST', `/henvendelser/${forste.id}/behandlet`, {})).data?.behandlet));
+
 console.log('App på hjemskjermen:');
 const man = await fetch(`${BASE}/api/manifest`).then((r) => r.json());
-sjekk('manifest uten innlogging starter på forsiden', man.start_url === '/');
+sjekk('manifest uten innlogging starter i appen', man.start_url === '/app');
 const levMan = (await lev2('GET', '/manifest')).data;
 sjekk('leverandør får egen startadresse', /^\/api\/inn\//.test(levMan.start_url), levMan.start_url);
 sjekk('samme startadresse ved neste henting', (await lev2('GET', '/manifest')).data.start_url === levMan.start_url);
 const app = await klient()('GET', levMan.start_url.replace('/api', ''));
-sjekk('startadressen logger inn', app.headers.get('location') === '/#/mine');
+sjekk('startadressen logger inn', app.headers.get('location') === '/app#/mine');
 await leder('POST', `/personer/${el.id}/lenke`);
-sjekk('ny lenke stenger også appens startadresse', (await klient()('GET', levMan.start_url.replace('/api', ''))).headers.get('location') === '/#/ugyldig-lenke');
+sjekk('ny lenke stenger også appens startadresse', (await klient()('GET', levMan.start_url.replace('/api', ''))).headers.get('location') === '/app#/ugyldig-lenke');
 sjekk('ny lenke stopper også kalenderen', (await hentIcs(kal3.adresse)).status === 404);
 
 console.log(`\n${ok} bestått, ${feil} feilet`);

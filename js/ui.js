@@ -70,6 +70,8 @@ const P = {
   share: '<path d="M12 15V3.5M7.5 8L12 3.5 16.5 8"/><path d="M5 12v8.5h14V12"/>',
   shift: '<path d="M3.5 12h14M13.5 7.5l4.5 4.5-4.5 4.5"/><path d="M20.5 5v14"/>',
   hammer: '<path d="M14.5 6.5l3 3M4 20l9.5-9.5M12 5l3-2.5 6 6-2.5 3-2-2-2 2-3-3 2-2z"/>',
+  melding: '<path d="M4 5h16v11H9l-5 4z"/><path d="M12 8v3M12 13.5v.01"/>',
+  inbox: '<path d="M3.5 13.5l2.5-8h12l2.5 8V19a1.5 1.5 0 0 1-1.5 1.5h-14A1.5 1.5 0 0 1 3.5 19z"/><path d="M3.5 13.5h5l1.5 2.5h4l1.5-2.5h5"/>',
 };
 
 export function icon(name, cls = '') {

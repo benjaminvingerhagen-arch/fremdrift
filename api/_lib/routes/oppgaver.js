@@ -127,7 +127,7 @@ route(
         unntatt: user.id,
         emne: `Meldt ferdig: ${o.tittel} (${p.navn})`,
         tekst: `${user.navn}${user.firma ? ` (${user.firma})` : ''} har meldt «${o.tittel}» ferdig i ${p.navn}.\nKontroller arbeidet og godkjenn, eller send oppgaven tilbake.`,
-        sti: `/#/p/${o.prosjekt_id}`,
+        sti: `/app#/p/${o.prosjekt_id}`,
       });
     }
     return rad;
@@ -188,7 +188,7 @@ route(
         unntatt: user.id,
         emne: `Ny melding fra ${user.navn}: ${o.tittel}`,
         tekst: `${user.navn} skrev om «${o.tittel}»:\n\n${utdrag}`,
-        sti: `/#/p/${o.prosjekt_id}`,
+        sti: `/app#/p/${o.prosjekt_id}`,
       });
     }
     return rad;
