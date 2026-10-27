@@ -45,7 +45,7 @@ export async function prosjektView(el, id, fane = '', erAktuell = () => true) {
     <div class="topp">
       <div class="tittel">
         <div class="over"><a href="#/">Prosjekter</a> ${icon('chevronRight')} <span>${p.kunde_navn || 'Prosjekt'}</span></div>
-        <h1>${p.navn}${p.arkivert ? html` <span class="chip">Avsluttet</span>` : ''}</h1>
+        <h1>${p.navn}${p.arkivert ? html` <span class="chip">Avsluttet</span>` : ''}${p.eksempel ? html` <span class="chip varsel" title="Oppdiktede data til demonstrasjon. Slett prosjektet under Innstillinger når du er ferdig.">Eksempel</span>` : ''}</h1>
         <div class="under">
           ${p.adresse ? html`<span>${icon('home')} ${p.adresse}</span>` : ''}
           ${p.innflytting ? html`<span>${icon('flag')} Innflytting ${datoMedDag(p.innflytting)}</span>` : ''}

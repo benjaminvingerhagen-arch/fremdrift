@@ -310,6 +310,21 @@ sjekk('kunden ser ikke økonomien', !JSON.stringify((await kunde('GET', `/k/${ny
 sjekk('prosjektet kan kobles fra', (await leder('PUT', `/prosjekter/${p.id}/tripletex`, { tripletex_id: null })).data?.tripletex_id === null);
 await leder('PUT', `/prosjekter/${p.id}/tripletex`, { tripletex_id: 101 });
 
+console.log('Eksempelprosjekt:');
+sjekk('leverandør kan ikke lage eksempelprosjekt', (await lev2('POST', '/eksempelprosjekt')).status === 403);
+const eks = await leder('POST', '/eksempelprosjekt');
+sjekk('prosjektleder lager eksempelprosjekt', eks.status === 200 && eks.data.navn.startsWith('Eksempel'), JSON.stringify(eks.data));
+const eksFull = (await leder('GET', `/prosjekter/${eks.data.id}`)).data;
+const eksStatus = new Set(eksFull.oppgaver.map((o) => (o.godkjent ? 'ok' : o.ferdig_meldt ? 'meldt' : 'apen')));
+sjekk('eksempelet har oppgaver i alle statuser', eksFull.oppgaver.length === 16 && eksStatus.size === 3, JSON.stringify([...eksStatus]));
+sjekk('eksempelet har milepæler, mangler og spørsmål til kunden', eksFull.milepaeler.length === 5 && eksFull.mangler.length === 3 && eksFull.beslutninger.length === 1);
+sjekk('eksempelet er merket', eksFull.prosjekt.eksempel === true && (await leder('GET', '/prosjekter')).data.find((x) => x.id === eks.data.id)?.eksempel === true);
+sjekk('eksempelet har dagbok', (await leder('GET', `/prosjekter/${eks.data.id}/dagbok`)).data.length === 3);
+const eksOk = (await leder('GET', `/prosjekter/${eks.data.id}/okonomi`)).data;
+sjekk('eksempelet viser eksempeltall uten Tripletex-kobling', eksOk.miljo === 'eksempel' && eksOk.kostnader.bokfort > 0 && eksOk.timer.sum > 0 && eksOk.budsjett.kostnad === 350000);
+sjekk('kundesiden til eksempelet virker', (await kunde('GET', `/k/${eksFull.prosjekt.kunde_token}`)).status === 200);
+sjekk('eksempelet kan slettes', (await leder('DELETE', `/prosjekter/${eks.data.id}`, { bekreft: eks.data.navn })).status === 200);
+
 console.log('App på hjemskjermen:');
 const man = await fetch(`${BASE}/api/manifest`).then((r) => r.json());
 sjekk('manifest uten innlogging starter i appen', man.start_url === '/app');

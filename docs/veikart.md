@@ -82,3 +82,4 @@ Bygglet m.fl.), tilpasset små byggefirma og håndverkere.
   med i, bare til lesing. Egne oppgaver er uthevet. Kan slås av per prosjekt («Fagene ser hele planen»).
 - 2026-10: Økonomi fra Tripletex: bokførte kostnader, fakturaer til godkjenning og førte timer per
   prosjekt, med budsjett mot fremdrift. Bare lesing. Lokal etterligning av Tripletex for utvikling og tester.
+- 2026-10: Eksempelprosjekt med ett trykk, med oppdiktede data og eksempeltall for økonomi, til demonstrasjon.

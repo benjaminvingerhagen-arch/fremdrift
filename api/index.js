@@ -14,6 +14,7 @@ import './_lib/routes/mangler.js';
 import './_lib/routes/dagbok.js';
 import './_lib/routes/henvendelser.js';
 import './_lib/routes/okonomi.js';
+import './_lib/routes/eksempel.js';
 import './_lib/routes/varsler.js';
 
 function routePath(req) {

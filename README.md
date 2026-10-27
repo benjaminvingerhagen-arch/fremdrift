@@ -29,6 +29,14 @@ Forsiden er foreløpig ikke søkbar (`noindex`) – det slås på når navn og d
   `KONTAKT_EPOST` (demo) og `FEILMELDING_EPOST` (feil, ellers `KONTAKT_EPOST`). Adressene står
   bare i Vercel, ikke i koden, siden repoet er offentlig. Avsenderen blir svaradresse.
 
+## Eksempelprosjekt
+
+«Lag eksempelprosjekt» på forsiden av appen lager en ferdig utfylt enebolig med oppdiktede data:
+plan med 16 oppgaver i alle statuser, milepæler, sjekkpunkter, mangler, dagbok, et spørsmål til
+kunden, en oppdatering på kundesiden og økonomi med eksempeltall (uten Tripletex). Datoene legges
+rundt dagens dato. Prosjektet er merket «Eksempel» og slettes som et vanlig prosjekt under
+Innstillinger. Knappen vises bare når det ikke finnes et aktivt eksempelprosjekt.
+
 ## Økonomi fra Tripletex
 
 Fanen **Økonomi** i prosjektet viser tall hentet fra Tripletex, bare til lesing og bare for

@@ -26,6 +26,7 @@ export async function prosjekterView(el) {
           <span>${aktive.length} pågående ${aktive.length === 1 ? 'prosjekt' : 'prosjekter'}</span>
         </div>
       </div>
+      ${aktive.some((p) => p.eksempel) ? '' : html`<button class="knapp" data-eksempel title="Et ferdig utfylt prosjekt med oppdiktede data, til å vise frem systemet">${icon('eye')} Lag eksempelprosjekt</button>`}
       <button class="knapp primar" data-nytt>${icon('plus')} Nytt prosjekt</button>
     </div>
     ${venter || forsinket
@@ -42,6 +43,16 @@ export async function prosjekterView(el) {
       ? html`<h2 style="margin:36px 0 14px">Avsluttede prosjekter</h2><div class="prosjektnett">${arkiv.map((p) => prosjektkort(p, dag))}</div>`
       : ''}`.toString();
   $$('[data-nytt]', el).forEach((b) => b.addEventListener('click', nyttProsjekt));
+  $('[data-eksempel]', el)?.addEventListener('click', async (e) => {
+    e.currentTarget.disabled = true;
+    const r = await attempt(() => api.post('/eksempelprosjekt'));
+    if (!r) {
+      e.currentTarget.disabled = false;
+      return;
+    }
+    toast('Eksempelprosjektet er laget');
+    location.hash = `#/p/${r.id}`;
+  });
 }
 
 function hilsen() {
@@ -70,6 +81,7 @@ function prosjektkort(p, dag) {
         ? html`<div class="linje"><span>${icon('flag')} ${p.neste_milepael.navn}</span><span>${ddmm(p.neste_milepael.dato)}</span></div>`
         : ''}
       <div class="varsler">
+        ${p.eksempel ? html`<span class="chip varsel">Eksempel</span>` : ''}
         ${p.forsinket ? html`<span class="chip fare">${p.forsinket} forsinket</span>` : ''}
         ${p.meldt ? html`<span class="chip info">${p.meldt} venter på godkjenning</span>` : ''}
         ${p.nye_svar ? html`<span class="chip ok">${p.nye_svar} ${p.nye_svar === 1 ? "nytt svar" : "nye svar"} fra kunden</span>` : ''}
