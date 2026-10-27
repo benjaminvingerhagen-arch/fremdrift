@@ -216,7 +216,7 @@ route(
     const prosjektIder = [...new Set(oppgaver.map((o) => o.prosjekt_id))];
     const prosjekter = prosjektIder.length
       ? await q(
-          `SELECT p.id, p.navn, p.adresse, p.innflytting,
+          `SELECT p.id, p.navn, p.adresse, p.innflytting, p.plan_for_fag,
                   COALESCE((SELECT json_agg(json_build_object('dato', m.dato, 'navn', m.navn, 'type', m.type) ORDER BY m.dato)
                      FROM milepaeler m WHERE m.prosjekt_id = p.id AND m.dato >= CURRENT_DATE - 1), '[]') AS milepaeler
              FROM prosjekter p WHERE p.id = ANY($1::int[])`,
@@ -227,3 +227,37 @@ route(
   },
   { alle: true },
 );
+
+// Hele planen for et prosjekt, for ansatte og leverandører som jobber der: alle fag,
+// bare til lesing. Prosjektlederen kan slå det av per prosjekt. Interne felt
+// (merknad, beskrivelse, ansvarlig, meldinger) følger bare med på egne oppgaver.
+route(
+  'GET',
+  '/mine/prosjekter/:id/plan',
+  async ({ params, user }) => {
+    const id = f.id(params.id);
+    const p = await one('SELECT id, navn, adresse, start, innflytting, sluttfrist, arkivert, plan_for_fag FROM prosjekter WHERE id = $1', [id]);
+    if (!p) fail(404, 'Fant ikke prosjektet.');
+    if (user.rolle !== 'leder') {
+      const med = await one(`SELECT 1 FROM oppgaver o WHERE o.prosjekt_id = $3 AND ${MINE} LIMIT 1`, [user.id, user.fag, id]);
+      if (!med || p.arkivert) fail(404, 'Fant ikke prosjektet.');
+      if (!p.plan_for_fag) fail(403, 'Prosjektlederen har ikke delt hele planen i dette prosjektet.');
+    }
+    const [oppgaver, milepaeler] = await Promise.all([
+      q(
+        `SELECT o.id, o.nr, o.fag, o.tittel, o.fra, o.til, o.prioritet, o.sortering, o.kunde_styrt,
+                o.ferdig_meldt IS NOT NULL AS meldt, o.godkjent IS NOT NULL AS ferdig, ${MINE} AS min,
+                CASE WHEN ${MINE} THEN o.merknad END AS merknad
+           FROM oppgaver o WHERE o.prosjekt_id = $3 ORDER BY o.sortering, o.fra, o.id`,
+        [user.id, user.fag, id],
+      ),
+      q('SELECT id, dato, navn, type, naadd FROM milepaeler WHERE prosjekt_id = $1 ORDER BY dato, id', [id]),
+    ]);
+    delete p.arkivert;
+    // Samme form som prosjektlederens oppgaver, så planvisningen kan brukes som den er.
+    const rader = oppgaver.map((o) => ({ ...o, ferdig_meldt: o.meldt || null, godkjent: o.ferdig || null }));
+    return { prosjekt: p, oppgaver: rader, milepaeler };
+  },
+  { alle: true },
+);
+

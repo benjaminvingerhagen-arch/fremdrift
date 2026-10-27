@@ -48,7 +48,7 @@ domenebytte.
 | Hvem | Kommer inn med | Ser og gjør |
 | --- | --- | --- |
 | Prosjektleder | E-post og passord | Alt: prosjekter, plan, godkjenning, personer, kundesiden |
-| Ansatt / leverandør | Personlig lenke (`/api/inn/<nøkkel>`) | Egne oppgaver i alle prosjekter. Melder ferdig, skriver meldinger og sender bilder |
+| Ansatt / leverandør | Personlig lenke (`/api/inn/<nøkkel>`) | Egne oppgaver i alle prosjekter: melder ferdig, skriver meldinger og sender bilder. Ser også hele planen (alle fag, Gantt) i prosjektene hen er med i – bare til lesing, og uten merknader, ansvarlige og meldinger på andres oppgaver. Kan slås av per prosjekt under Innstillinger |
 | Kunden | Prosjektets kundelenke (`/k/<nøkkel>`) | Fremdrift, milepæler, ukens arbeid, oppdateringer med bilder. Svarer på beslutninger og oppdaterer leveranser kunden styrer selv |
 
 Oppgaver fordeles etter **fag**: en leverandør med faget «Elektro» får alle

@@ -49,7 +49,9 @@ npm test                        # i et annet vindu, mot dev-serveren på tom dat
 ## Regler som ikke skal brytes
 
 - Kunden skal aldri se interne felt: «forsinket», merknader, ansvarlig, nøkler eller logg.
-- En leverandør ser bare egne oppgaver (ansvarlig, eller eget fag når ingen er ansvarlig).
+- En leverandør kan bare endre egne oppgaver (ansvarlig, eller eget fag når ingen er ansvarlig).
+  Hele planen i prosjekter hen er med i kan vises til lesing (`plan_for_fag`), men uten merknader,
+  ansvarlige, beskrivelser og meldinger på andres oppgaver.
 - En oppgave er ferdig først når prosjektlederen har godkjent den.
 - Hemmelige nøkler lagres som SHA-256-hash når det går: personlige lenker (`lenke_hash`) og
   økter (`token_hash`). Kundelenken (`kunde_token`) og app-nøkkelen (`app_nokkel`) ligger i

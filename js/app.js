@@ -5,6 +5,7 @@ import { prosjekterView } from './views/prosjekter.js';
 import { prosjektView } from './views/prosjekt.js';
 import { personerView } from './views/personer.js';
 import { mineApp } from './views/mine.js';
+import { fagplanView } from './views/fagplan.js';
 import { varslerView } from './views/varsler.js';
 import { innstillingerView, meldFeil } from './views/innstillinger.js';
 import { NAVN, SLAGORD } from '/shared/merke.js';
@@ -37,8 +38,15 @@ async function boot() {
   if (!me.user) return renderLogin(me.registrering);
   store.me = me.user;
   if (me.user.rolle !== 'leder') {
-    if (sti() !== '/mine') history.replaceState(null, '', '#/mine');
-    return mineApp(root);
+    // Ansatte og leverandører: egne oppgaver, og hele planen for prosjektene de er med i.
+    const visFag = () => {
+      const plan = sti().match(/^\/mine\/plan\/(\d+)$/);
+      window.scrollTo(0, 0);
+      return plan ? fagplanView(root, plan[1]) : mineApp(root);
+    };
+    if (sti() !== '/mine' && !/^\/mine\/plan\/\d+$/.test(sti())) history.replaceState(null, '', '#/mine');
+    window.addEventListener('hashchange', visFag);
+    return visFag();
   }
   if (sti() === '/mine' || sti() === '/ugyldig-lenke') history.replaceState(null, '', '#/');
   await lastProsjekter();

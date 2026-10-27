@@ -17,6 +17,7 @@ const SPEC = {
   innflytting: f.date,
   sluttfrist: f.date,
   kunde_aktiv: (x) => (x === undefined ? true : f.bool(x)),
+  plan_for_fag: (x) => (x === undefined ? true : f.bool(x)),
   forsidebilde_id: f.id,
   arkivert: f.bool,
 };

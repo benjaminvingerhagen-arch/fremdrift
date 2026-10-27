@@ -264,6 +264,26 @@ sjekk('leverandør ser ikke henvendelsene', (await lev2('GET', '/henvendelser'))
 const forste = henv.rader[0];
 sjekk('henvendelse merkes som behandlet', Boolean((await leder('POST', `/henvendelser/${forste.id}/behandlet`, {})).data?.behandlet));
 
+console.log('Hele planen for fagene:');
+const lev3 = lev2;
+await leder('PUT', `/oppgaver/${oMal.id}`, { merknad: 'Intern: maler er dyr, pass på timene' });
+const fp = await lev3('GET', `/mine/prosjekter/${p.id}/plan`);
+sjekk('leverandør ser hele planen i eget prosjekt', fp.status === 200 && fp.data.oppgaver.some((o) => o.fag === 'Maler') && fp.data.oppgaver.some((o) => o.min), JSON.stringify(fp.data?.oppgaver?.map((o) => o.fag)));
+sjekk('egne oppgaver er merket', fp.data.oppgaver.filter((o) => o.min).every((o) => o.fag === 'Elektro'));
+sjekk('andres merknad vises ikke', !JSON.stringify(fp.data).includes('maler er dyr'));
+sjekk('ansvarlig og beskrivelse er ikke med', fp.data.oppgaver.every((o) => !('ansvarlig_id' in o) && !('beskrivelse' in o)));
+sjekk('milepælene er med', fp.data.milepaeler.some((m) => m.navn === 'Innflytting'));
+sjekk('kundelenken er ikke med', !JSON.stringify(fp.data).includes('kunde_token') && !('kunde_navn' in fp.data.prosjekt));
+const utenfor = (await leder('POST', '/prosjekter', { navn: 'Prosjekt uten elektro', start: '2026-10-01' })).data;
+await leder('POST', `/prosjekter/${utenfor.id}/oppgaver`, { fag: 'Maler', tittel: 'Male', fra: '2026-10-05', til: '2026-10-07' });
+sjekk('leverandør ser ikke planen i prosjekter hen ikke er med i', (await lev3('GET', `/mine/prosjekter/${utenfor.id}/plan`)).status === 404);
+sjekk('/mine sier at planen er delt', (await lev3('GET', '/mine')).data.prosjekter.find((x) => x.id === p.id)?.plan_for_fag === true);
+await leder('PUT', `/prosjekter/${p.id}`, { plan_for_fag: false });
+sjekk('prosjektleder kan slå av delingen', (await lev3('GET', `/mine/prosjekter/${p.id}/plan`)).status === 403);
+await leder('PUT', `/prosjekter/${p.id}`, { plan_for_fag: true });
+sjekk('leverandør kan fortsatt ikke hente hele prosjektet', (await lev3('GET', `/prosjekter/${p.id}`)).status === 403);
+sjekk('uten innlogging får man ikke planen', (await klient()('GET', `/mine/prosjekter/${p.id}/plan`)).status === 401);
+
 console.log('App på hjemskjermen:');
 const man = await fetch(`${BASE}/api/manifest`).then((r) => r.json());
 sjekk('manifest uten innlogging starter i appen', man.start_url === '/app');
