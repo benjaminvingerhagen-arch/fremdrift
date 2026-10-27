@@ -40,7 +40,7 @@ sjekk('prosjektleder registreres', reg.status === 200, JSON.stringify(reg.data))
 sjekk('ny registrering er stengt', (await klient()('POST', '/registrer', { kode: KODE, navn: 'Y', epost: 'y@y.no', passord: 'langt-passord-1' })).status === 403);
 sjekk('CSRF: uten egen header avvises', (await leder('POST', '/prosjekter', { navn: 'x' }, { 'X-FD': '0' })).status === 403);
 
-const p = (await leder('POST', '/prosjekter', { navn: 'Vavikbakken 24', start: '2026-10-26', innflytting: '2026-11-13', sluttfrist: '2026-11-27', kunde_navn: 'Familien Test' })).data;
+const p = (await leder('POST', '/prosjekter', { navn: 'Eksempelveien 12', start: '2026-10-26', innflytting: '2026-11-13', sluttfrist: '2026-11-27', kunde_navn: 'Familien Test' })).data;
 const annet = (await leder('POST', '/prosjekter', { navn: 'Annet prosjekt', start: '2026-10-01' })).data;
 sjekk('prosjekt opprettes med kundelenke', p.id && p.kunde_token?.length > 20);
 
