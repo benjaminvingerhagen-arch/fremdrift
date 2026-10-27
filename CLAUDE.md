@@ -71,4 +71,8 @@ npm test                        # i et annet vindu, mot dev-serveren på tom dat
 3. Kjør testene, og sjekk siden i nettleseren (også mobilbredde) når du endrer utseende.
 4. Oppdater `docs/veikart.md`: flytt det som er gjort til «Gjort», og legg til nye ideer du fant.
 5. Åpne en pull request mot `main` med forklaring på enkelt norsk: hva, hvorfor, og hva som
-   bør sjekkes i Vercel-forhåndsvisningen. Ikke slå sammen selv; Benjamin godkjenner.
+   bør sjekkes i Vercel-forhåndsvisningen.
+6. Godkjenning: Benjamin (eier) og Daniel (`danielvingerhagen-cmyk`) kan begge godkjenne og slå
+   sammen. Slå bare sammen når en av dem ber om det i økten, og bare når testene er grønne. Fikk du
+   ikke kjørt testene, si det i pull requesten og ikke slå sammen. Den ukentlige agenten slår aldri
+   sammen selv.
