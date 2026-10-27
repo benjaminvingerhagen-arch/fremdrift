@@ -4,6 +4,7 @@ import { f, fail, logg } from '../http.js';
 import { tripletexGet, tripletexAlle, tripletexSattOpp, tripletexMiljo, TripletexFeil } from '../tripletex.js';
 import { iDag, leggTilDager, isoUke, ukedag, fremdrift } from '../../../shared/plan.js';
 import { prosjektFinnes } from './prosjekter.js';
+import { eksempelOkonomi, EKSEMPEL_TRIPLETEX_ID } from '../eksempeldata.js';
 
 // Økonomi i prosjektet, hentet fra Tripletex: kostnader som er bokført på prosjektet,
 // leverandørfakturaer som venter på godkjenning, og timer som er ført. Bare lesing,
@@ -234,7 +235,7 @@ export function sammenstill(r, tid) {
 
 route('GET', '/prosjekter/:id/okonomi', async ({ params, query }) => {
   const id = f.id(params.id);
-  const p = await one('SELECT id, tripletex_id, tripletex_navn, budsjett_kostnad, budsjett_timer FROM prosjekter WHERE id = $1', [id]);
+  const p = await one('SELECT id, tripletex_id, tripletex_navn, budsjett_kostnad, budsjett_timer, eksempel FROM prosjekter WHERE id = $1', [id]);
   if (!p) fail(404, 'Fant ikke prosjektet.');
   const oppgaver = await q('SELECT godkjent, ferdig_meldt FROM oppgaver WHERE prosjekt_id = $1', [id]);
   const grunn = {
@@ -245,6 +246,18 @@ route('GET', '/prosjekter/:id/okonomi', async ({ params, query }) => {
     budsjett: { kostnad: p.budsjett_kostnad === null ? null : Number(p.budsjett_kostnad), timer: p.budsjett_timer === null ? null : Number(p.budsjett_timer) },
     fremdrift: fremdrift(oppgaver).prosent,
   };
+  // Eksempelprosjektet viser oppdiktede tall, også når Tripletex ikke er satt opp.
+  if (p.eksempel) {
+    return {
+      ...grunn,
+      satt_opp: true,
+      miljo: 'eksempel',
+      tripletex_id: EKSEMPEL_TRIPLETEX_ID,
+      tripletex_navn: '1001 Eksempelveien 12 (eksempeltall)',
+      ...sammenstill(eksempelOkonomi(), EKSEMPEL_TRIPLETEX_ID),
+      hentet: new Date().toISOString(),
+    };
+  }
   if (!grunn.satt_opp || !p.tripletex_id) return grunn;
 
   const buffer = await one('SELECT data, hentet, EXTRACT(EPOCH FROM now() - hentet)::int AS alder FROM tripletex_buffer WHERE prosjekt_id = $1 AND tripletex_id = $2', [id, p.tripletex_id]);

@@ -53,7 +53,7 @@ export async function prosjektFinnes(id) {
 route('GET', '/prosjekter', async () => {
   const dag = iDag();
   return q(
-    `SELECT p.id, p.navn, p.adresse, p.kunde_navn, p.start, p.innflytting, p.sluttfrist, p.arkivert, p.forsidebilde_id,
+    `SELECT p.id, p.navn, p.adresse, p.kunde_navn, p.start, p.innflytting, p.sluttfrist, p.arkivert, p.forsidebilde_id, p.eksempel,
             COUNT(o.id)::int AS total,
             COUNT(o.id) FILTER (WHERE o.godkjent IS NOT NULL)::int AS ferdig,
             COUNT(o.id) FILTER (WHERE o.godkjent IS NULL AND o.ferdig_meldt IS NOT NULL)::int AS meldt,

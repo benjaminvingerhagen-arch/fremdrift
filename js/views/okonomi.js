@@ -49,11 +49,11 @@ function tegn(el, ctx, d) {
   el.innerHTML = html`
     <div class="ok-hode">
       <span class="ok-kilde">${icon('link')} Tripletex-prosjekt <strong>${d.tripletex_navn}</strong>
-        ${d.miljo !== 'produksjon' ? html`<span class="chip varsel">${d.miljo === 'falsk' ? 'Oppdiktede testdata' : 'Testmiljø'}</span>` : ''}</span>
+        ${d.miljo !== 'produksjon' ? html`<span class="chip varsel">${d.miljo === 'eksempel' ? 'Eksempeltall – ikke fra Tripletex' : d.miljo === 'falsk' ? 'Oppdiktede testdata' : 'Testmiljø'}</span>` : ''}</span>
       <span class="muted small" data-hentet>Oppdatert ${kl.format(new Date(d.hentet))} · oppdateres av seg selv</span>
       <span class="spacer"></span>
-      <button class="knapp liten" data-oppdater>${icon('refresh')} Oppdater nå</button>
-      <button class="knapp liten lys" data-endre>${icon('settings')} Endre kobling</button>
+      ${d.miljo === 'eksempel' ? '' : html`<button class="knapp liten" data-oppdater>${icon('refresh')} Oppdater nå</button>
+      <button class="knapp liten lys" data-endre>${icon('settings')} Endre kobling</button>`}
     </div>
     ${d.feil ? html`<div class="banner fare">${icon('alert')} ${d.feil} Viser tallene fra ${kl.format(new Date(d.hentet))}.</div>` : ''}
     ${(d.merknader || []).map((m) => html`<div class="banner">${icon('help')} ${m}</div>`)}
@@ -116,7 +116,7 @@ function tegn(el, ctx, d) {
     </div>
     <p class="muted xs ok-fot">Kostnader er posteringer på konto 4000–7999 som er ført på prosjektet i Tripletex, uten mva. «Til godkjenning» er leverandørfakturaer på prosjektet som ennå ikke er bokført. Ingenting endres i Tripletex herfra.</p>`.toString();
 
-  $('[data-oppdater]', el).addEventListener('click', async (e) => {
+  $('[data-oppdater]', el)?.addEventListener('click', async (e) => {
     e.currentTarget.disabled = true;
     try {
       await el.oppdater(true);
@@ -126,7 +126,7 @@ function tegn(el, ctx, d) {
       e.currentTarget.disabled = false;
     }
   });
-  $('[data-endre]', el).addEventListener('click', () => kobleTil(el, ctx, d, true));
+  $('[data-endre]', el)?.addEventListener('click', () => kobleTil(el, ctx, d, true));
   $('[data-budsjett]', el).addEventListener('click', () => budsjettSkjema(el, ctx, d));
 }
 

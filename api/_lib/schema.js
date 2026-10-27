@@ -257,9 +257,12 @@ CREATE TABLE IF NOT EXISTS tripletex_buffer (
   data JSONB NOT NULL,
   hentet TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- Versjon 10: eksempelprosjekt til demonstrasjon (oppdiktede data, økonomi uten Tripletex).
+ALTER TABLE prosjekter ADD COLUMN IF NOT EXISTS eksempel BOOLEAN NOT NULL DEFAULT false;
 `;
 
-const VERSJON = 9;
+const VERSJON = 10;
 let klar = null;
 
 export function ensureSchema() {
