@@ -89,5 +89,3 @@ Bygglet m.fl.), tilpasset små byggefirma og håndverkere.
 - 2026-10: Eksempelprosjekt med ett trykk, med oppdiktede data og eksempeltall for økonomi, til demonstrasjon.
 - 2026-10: Dokumenthotell per prosjekt (kategorier, deling med kunde og fag, fagene leverer selv, Word og
   Excel i tillegg til PDF og bilder) og ukesoppsummering med utkast til ukesoppdatering for kunden.
-- 2026-10: Hovedfargen byttet fra blå til grønn i forsiden, appen og kundesiden (merkefarge, meny,
-  knapper, logo og app-ikoner). Gantt-fargene for prioritet er beholdt blå, så de ikke forveksles med grønt «ferdig».

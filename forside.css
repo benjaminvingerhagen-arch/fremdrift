@@ -2,23 +2,23 @@
    laster raskt og kan endres uten å påvirke appen. */
 
 :root {
-  --ink: #173a2a;
-  --ink-2: #1d4532;
-  --ink-line: #2b5440;
+  --ink: #16212c;
+  --ink-2: #1f2c39;
+  --ink-line: #2c3a48;
   --paper: #f3f1ec;
   --surface: #ffffff;
   --surface-2: #e9e5dd;
   --line: #e3dfd7;
-  --fg: #14231b;
-  --fg-2: #34443b;
+  --fg: #16212c;
+  --fg-2: #35414d;
   --fg-3: #4b5661;
   --fg-muted: #616b75;
-  --fg-on-dark: #eef3f0;
-  --fg-muted-dark: #9bb0a4;
-  --brand: #1d5b43;
-  --brand-2: #2b7a55;
-  --brand-soft: #e5f1ea;
-  --brand-light: #b9dcc7;
+  --fg-on-dark: #eef1f4;
+  --fg-muted-dark: #9aa6b2;
+  --brand: #1f4e79;
+  --brand-2: #2a6aa3;
+  --brand-soft: #e6eef7;
+  --brand-light: #b8cfe6;
   --signal: #e8590c;
   --signal-lys: #f08a4b;
   --signal-soft: #fdeee4;
@@ -32,7 +32,7 @@
   --r-md: 12px;
   --r-lg: 18px;
   --maks: 1160px;
-  --skygge: 0 24px 60px -24px rgba(20, 35, 27, 0.3), 0 2px 6px rgba(20, 35, 27, 0.06);
+  --skygge: 0 24px 60px -24px rgba(22, 33, 44, 0.3), 0 2px 6px rgba(22, 33, 44, 0.06);
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -210,7 +210,7 @@ p { margin: 0; }
 .demo-tekst h3 { font-size: 26px; margin-bottom: 14px; }
 .demo-tekst p { color: var(--fg-3); }
 .demo-tekst p + p { margin-top: 12px; }
-.liten-skjerm { box-shadow: 0 16px 40px -20px rgba(20, 35, 27, .28); }
+.liten-skjerm { box-shadow: 0 16px 40px -20px rgba(22, 33, 44, .28); }
 
 .telefon { justify-self: center; width: 290px; max-width: 100%; border: 10px solid var(--ink); border-radius: 36px; background: var(--paper); overflow: hidden; box-shadow: var(--skygge); }
 .telefon-topp { background: var(--ink); color: #fff; padding: 16px 16px 18px; display: grid; gap: 2px; }

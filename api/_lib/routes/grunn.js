@@ -109,8 +109,8 @@ route(
         start_url: start,
         scope: '/',
         display: 'standalone',
-        background_color: '#173a2a',
-        theme_color: '#173a2a',
+        background_color: '#16212c',
+        theme_color: '#16212c',
         lang: 'nb-NO',
         icons: [
           { src: '/logo/ikon-192.png', sizes: '192x192', type: 'image/png' },
