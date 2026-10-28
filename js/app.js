@@ -156,7 +156,7 @@ async function route() {
 
 function demoGantt() {
   const rader = [
-    [0, 38, '#2a6aa3'], [18, 30, '#8fb7da'], [28, 46, '#172a20'], [40, 30, '#4c9a6a'], [56, 34, '#2a6aa3'], [70, 30, '#f08a4b'],
+    [0, 38, '#2a6aa3'], [18, 30, '#8fb7da'], [28, 46, '#1b2b3c'], [40, 30, '#4c9a6a'], [56, 34, '#2a6aa3'], [70, 30, '#f08a4b'],
   ];
   return html`<div class="demo-gantt" aria-hidden="true">${rader.map(
     ([fra, bredde, farge]) => html`<div style="margin-left:${fra}%;width:${bredde}%;background:${farge}"></div>`,
