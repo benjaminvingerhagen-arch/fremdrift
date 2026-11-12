@@ -20,6 +20,8 @@
   --brand-soft: #e6eef7;
   --brand-light: #b8cfe6;
   --signal: #e8590c;
+  /* Mørkere signalfarge for liten tekst og knapper med hvit tekst (minst 4,5:1, WCAG AA). */
+  --signal-tekst: #c2410c;
   --signal-lys: #f08a4b;
   --signal-soft: #fdeee4;
   --ok: #2f7d4f;
@@ -103,7 +105,7 @@ p { margin: 0; }
 /* ---------- Felles ---------- */
 .merke {
   display: inline-block; font-family: var(--font-mono); font-size: 13px; text-transform: uppercase;
-  letter-spacing: 0.08em; color: var(--signal); margin-bottom: 14px;
+  letter-spacing: 0.08em; color: var(--signal-tekst); margin-bottom: 14px;
 }
 .seksjon { padding: 104px 0; }
 @media (max-width: 700px) { .seksjon { padding: 72px 0; } }
@@ -158,7 +160,7 @@ p { margin: 0; }
 .bar.meldt { background: #8b72d0; }
 .milepael { position: absolute; top: 5px; left: calc(var(--fra) * 1%); width: 12px; height: 12px; background: var(--signal); transform: translateX(-50%) rotate(45deg); border-radius: 2px; }
 .i-dag { position: absolute; top: 18px; bottom: 16px; left: calc(74px + 10px + (100% - 84px) * var(--fra) / 100); width: 2px; background: var(--signal); }
-.i-dag small { position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%); font-size: 10.5px; color: var(--signal); font-weight: 700; white-space: nowrap; }
+.i-dag small { position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%); font-size: 10.5px; color: var(--signal-tekst); font-weight: 700; white-space: nowrap; }
 @media (max-width: 520px) { .gantt-uker, .gantt-rad { grid-template-columns: 58px 1fr; } .gantt-uker { grid-template-columns: 58px repeat(3, 1fr); } .i-dag { left: calc(58px + 10px + (100% - 68px) * var(--fra) / 100); } }
 .gantt { padding-bottom: 24px; }
 
@@ -265,7 +267,7 @@ p { margin: 0; }
 @media (max-width: 960px) { .pris-grid { grid-template-columns: 1fr; max-width: 460px; } }
 .pris-kort { position: relative; display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 32px 28px 28px; }
 .pris-kort.fremhevet { border: 2px solid var(--ink); box-shadow: var(--skygge); }
-.pris-merke { position: absolute; top: -13px; left: 28px; background: var(--signal); color: #fff; font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 999px; }
+.pris-merke { position: absolute; top: -13px; left: 28px; background: var(--signal-tekst); color: #fff; font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 999px; }
 .pris-kort h3 { font-size: 22px; }
 .pris-for { color: var(--fg-muted); font-size: 15px; margin-top: 4px; }
 .pris { margin: 24px 0; }
@@ -300,7 +302,7 @@ p { margin: 0; }
 .skjema-melding { min-height: 1.4em; font-size: 15px; color: var(--fg-muted-dark); }
 .skjema-melding.ok { color: #9be0b5; font-weight: 600; }
 .skjema-melding.feil { color: var(--signal-lys); font-weight: 600; }
-.prov .knapp { background: var(--signal); border-color: var(--signal); }
+.prov .knapp { background: var(--signal-tekst); border-color: var(--signal-tekst); }
 .prov .knapp:hover { background: #cf4e09; }
 .prov .knapp.sekundar { background: transparent; color: #fff; border-color: rgba(255, 255, 255, 0.4); }
 .prov .knapp.sekundar:hover { border-color: #fff; background: rgba(255, 255, 255, 0.06); }
